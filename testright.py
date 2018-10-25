@@ -53,8 +53,10 @@ class TestMyCode (unittest.TestCase):
             self.x.tokenize(s)
 
     def test_MyError_emptyString(self):
-        with self.assertRaises(ValueError):
-            self.x.tokenize('')
+        result=self.x.tokenize('')
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 0)
+        
 if __name__== '__main__':
     unittest.main()
         
