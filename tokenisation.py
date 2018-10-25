@@ -60,6 +60,8 @@ class Tokenizer(object):
         if not isinstance(strim,str):
             raise ValueError('Input has an unappropriate type,it should be str')
         tokensback=[]  # clean list
+        if not strim: 
+            return tokensback
         position=0
         if strim[0].isalpha():
             inToken = True
