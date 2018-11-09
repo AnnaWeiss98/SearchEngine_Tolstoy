@@ -1,14 +1,19 @@
 import unittest
 from tokenisation import Tokenizer
 from collections import Generator
+
+
 class TestMyCode (unittest.TestCase):
     # making a unit of Tokeniser class
+    
     def setUp(self):
         self.x = Tokenizer()
     # the test itself
+    
     def test_mygenerator_type(self):
-        result= self.x.tokenize_generator_type(' h50 ht ? 20 h d sun')
+        result = self.x.tokenize_generator_type(' h50 ht ? 20 h d sun')
         self.assertIsInstance(result, Generator)
+        
     def test_type(self):
         result = list(self.x.tokenize_generator_type(' h50 ht ? 20 h d sun'))
         self.assertIsInstance(result, list)
@@ -17,16 +22,20 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[0].t, 'S')
         self.assertEqual(result[14].s,'sun')
         self.assertEqual(result[14].t, 'A')
+        
     def  test_MyError_type_number(self):
         with self.assertRaises(ValueError):
             list(self.x.tokenize_generator_type(12))
+            
     def test_MyError_type_notList(self):
-        s=[1, 2, 3, 'this is my string']
+        s = [1, 2, 3, 'this is my string']
         with self.assertRaises(ValueError):
             list(self.x.tokenize_generator_type(s))   
+            
     def test_mygenerator(self):
-        result= self.x.tokenize_generator(' h50 ht ? 20 h d sun')
+        result = self.x.tokenize_generator(' h50 ht ? 20 h d sun')
         self.assertIsInstance(result, Generator)
+        
     def test_my_gen_begins_with_no_alpha(self):
         result=list(self.x.tokenize_generator(' h50 ht ? 20 h d sun'))
         self.assertIsInstance(result, list)
