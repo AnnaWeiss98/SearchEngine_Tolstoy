@@ -37,7 +37,7 @@ class TestMyCode (unittest.TestCase):
         self.assertIsInstance(result, Generator)
         
     def test_my_gen_begins_with_no_alpha(self):
-        result=list(self.x.tokenize_generator(' h50 ht ? 20 h d sun'))
+        result = list(self.x.tokenize_generator(' h50 ht ? 20 h d sun'))
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 6)
         self.assertEqual(result[0].s, 'h')
@@ -46,7 +46,7 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[1].position, 5)
         
     def test_my_gen_begins_with_alpha(self):
-        result=list(self.x.tokenize_generator('h50 ht ? 20 h d sun'))
+        result = list(self.x.tokenize_generator('h50 ht ? 20 h d sun'))
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 6)
         self.assertEqual(result[0].s, 'h')
@@ -55,7 +55,7 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[1].position, 4)
         
     def test_my_gen_ends_with_no_alpha(self):
-       result=list(self.x.tokenize_generator('h50 ht ? 20 h d sun'))
+       result = list(self.x.tokenize_generator('h50 ht ? 20 h d sun'))
        self.assertIsInstance(result, list)
        self.assertEqual(len(result), 6)
        self.assertEqual(result[0].s, 'h')
