@@ -3,6 +3,8 @@ tokenizer
 this module performs tokenisation of a text and extracts tokens
 """
 import unicodedata #this is a module
+
+
 class Token(object):  # example, part of token's klass
    
     """
@@ -158,7 +160,7 @@ class Tokenizer(object):
                 p = self.get_type(strim[i-1])
                 s = strim[position:i]  # representation of string
                 position=i
-                t = Token_1(s,T)  
+                t = Token_1(s,p)  
                 yield t
         """
         condition for alphabetic symbol standing without nonalphabetic symbol after it
@@ -167,7 +169,7 @@ class Tokenizer(object):
         if self.get_type(c):
             p = self.get_type(c)
             s = strim[position:i+1]
-            t = Token_1(s,T)
+            t = Token_1(s,p)
             yield t
 x = Tokenizer()
 for i in x.tokenize_generator_type(' h50 ht ? 20 h d sun'):
