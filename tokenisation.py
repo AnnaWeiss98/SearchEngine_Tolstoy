@@ -4,6 +4,7 @@ this module performs tokenisation of a text and extracts tokens
 """
 import unicodedata #this is a module
 class Token(object):  # example, part of token's klass
+   
     """
     Class of tokens taken from a given text
     """
@@ -15,7 +16,7 @@ class Token(object):  # example, part of token's klass
         @return: token
         """
         self.position=position  # token's position in the text
-        self.s=s  # write the meaning of variable
+        self.s = s  # write the meaning of variable
         
     def __repr__(self):
         """
@@ -35,8 +36,8 @@ class Token_1 (Token):  # example, part of token's klass
         @param s: s is a presentation of token's string
         @return: token
         """
-        self.s=s  # write the meaning of variable
-        self.t=t #type
+        self.s = s  # write the meaning of variable
+        self.t = t # type
     def __repr__(self):
         """
         a function that asign numbers to tokens
@@ -59,10 +60,10 @@ class Tokenizer(object):
         """
         if not isinstance(strim,str):
             raise ValueError('Input has an unappropriate type,it should be str')
-        tokensback=[]  # clean list
+        tokensback = []  # clean list
         if not strim: 
             return tokensback
-        position=0
+        position = 0
         if strim[0].isalpha():
             inToken = True
         else:
@@ -70,10 +71,10 @@ class Tokenizer(object):
         for i,c in enumerate(strim):
             if c.isalpha()and not strim[i-1].isalpha():
                 position=i
-                inToken=True
+                inToken = True
             if not c.isalpha()and strim[i-1].isalpha() and inToken:
-                s=strim[position:i]  # срез
-                t=Token(position,s)  
+                s = strim[position:i]  # срез
+                t = Token(position,s)  
                 tokensback.append(t)  # writing token to list
                 inToken = False
         """
@@ -81,13 +82,13 @@ class Tokenizer(object):
         it is important for the end of text
         """
         if c.isalpha():
-            s=strim[position:i+1]     
-            t=Token(position,s)
+            s = strim[position:i+1]     
+            t = Token(position,s)
             tokensback.append(t)
         return tokensback
         if c.isalpha():
-            s=strim[position:i-1]     
-            t=Token(position,s)
+            s = strim[position:i-1]     
+            t = Token(position,s)
             tokensback.append(t)
         return tokensback
 
@@ -106,25 +107,25 @@ class Tokenizer(object):
             inToken = False
         for i,c in enumerate(strim):
             if c.isalpha()and not strim[i-1].isalpha():
-                position=i
+                position = i
                 inToken=True
             if not c.isalpha()and strim[i-1].isalpha() and inToken:
-                s=strim[position:i]  # срез
-                t=Token(position,s)  
-                yield (t)  # writing token 
+                s = strim[position:i]  # срез
+                t = Token(position,s)  
+                yield t  # writing token 
                 inToken = False
         """
         condition for alphabetic symbol standing without nonalphabetic symbol after it
         it is important for the end of text
         """
         if c.isalpha():
-            s=strim[position:i+1]     
-            t=Token(position,s)
-            yield(t)
+            s = strim[position:i+1]     
+            t = Token(position,s)
+            yield t
         if c.isalpha():
-            s=strim[position:i-1]     
-            t=Token(position,s)
-            yield(t)
+            s = strim[position:i-1]     
+            t = Token(position,s)
+            yield t
             
     @staticmethod
     def get_type(c):
@@ -132,16 +133,16 @@ class Tokenizer(object):
        this function defines the type
        """
        if c.isalpha():
-           T='A'
+           p = 'A'
        if c.isdigit():
-            T='D'
+           p = 'D'
        if c.isspace():
-           T='S'
+           p = 'S'
            # we are looking for spaces
            #(punctuation)
        if unicodedata.category(c)[0]=='P':
-           T='P'
-       return T
+           p = 'P'
+       return p
     
     def tokenize_generator_type(self,strim):
         """
@@ -151,23 +152,23 @@ class Tokenizer(object):
         """
         if not isinstance(strim,str):
             raise ValueError('Input must be str !')
-        position=0
+        position = 0
         for i,c in enumerate(strim):
-            if self.get_type(c) != self.get_type(strim[i-1]) and i>0:
-                T= self.get_type(strim[i-1])
-                s=strim[position:i]  # representation of string
+            if self.get_type(c) != i>0 and self.get_type(strim[i-1]):
+                p = self.get_type(strim[i-1])
+                s = strim[position:i]  # representation of string
                 position=i
-                t=Token_1(s,T)  
-                yield (t)
+                t = Token_1(s,T)  
+                yield t
         """
         condition for alphabetic symbol standing without nonalphabetic symbol after it
         it is important for the end of text
         """
         if self.get_type(c):
-            T= self.get_type(c)
-            s=strim[position:i+1]
-            t=Token_1(s,T)
-            yield(t)
+            p = self.get_type(c)
+            s = strim[position:i+1]
+            t = Token_1(s,T)
+            yield t
 x = Tokenizer()
 for i in x.tokenize_generator_type(' h50 ht ? 20 h d sun'):
     print(i) 
