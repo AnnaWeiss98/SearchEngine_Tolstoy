@@ -64,7 +64,7 @@ class TestMyCode (unittest.TestCase):
        self.assertEqual(result[4].position, 16)
         
     def test_my_gen_ends_with_alpha(self):
-        result=list(self.x.tokenize_generator('h50 ht ? 20 h d sun'))
+        result = list(self.x.tokenize_generator('h50 ht ? 20 h d sun'))
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 6)
         self.assertEqual(result[0].s, 'h')
@@ -77,17 +77,17 @@ class TestMyCode (unittest.TestCase):
             list(self.x.tokenize_generator(12))
             
     def test_MyError_notList_gen(self):
-        s=[1, 2, 3, 'my name is Anya']
+        s = [1, 2, 3, 'my name is Anya']
         with self.assertRaises(ValueError):
            list(self.x.tokenize_generator(s))
 
     def test_MyError_emptyString(self):
-        result=self.x.tokenize('')
+        result = self.x.tokenize('')
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 0)
             
     def test_begins_with_no_alpha(self):
-        result=self.x.tokenize(' h50 ht ? 20 h d sun')
+        result = self.x.tokenize(' h50 ht ? 20 h d sun')
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 5)
         self.assertEqual(result[0].s, 'h')
@@ -96,7 +96,7 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[1].position, 5)
         
     def test_begins_with_alpha(self):
-        result=self.x.tokenize('h50 ht ? 20 h d sun')
+        result = self.x.tokenize('h50 ht ? 20 h d sun')
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 5)
         self.assertEqual(result[0].s, 'h')
@@ -105,7 +105,7 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[1].position, 4)
         
     def test_ends_with_no_alpha(self):
-        result=self.x.tokenize(' h50 ht ? 20 h d sun')
+        result = self.x.tokenize(' h50 ht ? 20 h d sun')
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 5)
         self.assertEqual(result[0].s, 'h')
@@ -114,7 +114,7 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[4].position, 17)
         
     def test_ends_with_alpha(self):
-        result=self.x.tokenize(' h50 ht ? 20 h d sun')
+        result = self.x.tokenize(' h50 ht ? 20 h d sun')
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 5)
         self.assertEqual(result[0].s, 'h')
@@ -127,7 +127,7 @@ class TestMyCode (unittest.TestCase):
             self.x.tokenize(12)
             
     def test_MyError_notList(self):
-        s=[1, 2, 3, 'my name is Anya']
+        s = [1, 2, 3, 'my name is Anya']
         with self.assertRaises(ValueError):
             self.x.tokenize(s)
 
