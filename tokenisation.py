@@ -17,7 +17,7 @@ class Token(object):  # example, part of token's klass
         @param s: s is a presentation of token's string
         @return: token
         """
-        self.position=position  # token's position in the text
+        self.position = position  # token's position in the text
         self.s = s  # write the meaning of variable
         
     def __repr__(self):
@@ -72,7 +72,7 @@ class Tokenizer(object):
             inToken = False
         for i,c in enumerate(strim):
             if c.isalpha()and not strim[i-1].isalpha():
-                position=i
+                position = i
                 inToken = True
             if not c.isalpha()and strim[i-1].isalpha() and inToken:
                 s = strim[position:i]  # срез
@@ -102,7 +102,7 @@ class Tokenizer(object):
         """
         if not isinstance(strim,str):
             raise ValueError('Input has an unappropriate type,it should be str')
-        position=0
+        position = 0
         if strim[0].isalpha():
             inToken = True
         else:
@@ -110,7 +110,7 @@ class Tokenizer(object):
         for i,c in enumerate(strim):
             if c.isalpha()and not strim[i-1].isalpha():
                 position = i
-                inToken=True
+                inToken = True
             if not c.isalpha()and strim[i-1].isalpha() and inToken:
                 s = strim[position:i]  # срез
                 t = Token(position,s)  
