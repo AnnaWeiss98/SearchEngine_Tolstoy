@@ -23,7 +23,7 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(result[14].s,'sun')
         self.assertEqual(result[14].t, 'A')
         
-    def  test_MyError_type_number(self):
+    def test_MyError_type_number(self):
         with self.assertRaises(ValueError):
             list(self.x.tokenize_generator_type(12))
             
