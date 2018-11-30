@@ -20,9 +20,7 @@ class IndexTest(unittest.TestCase):
         file.write('Baikal')
         file.close()
         self.x.prescribe_index('test.txt')
-        '''
-        The method listdir() returns a list containing the names of the entries in the directory given by path.
-        '''
+        #The method listdir() returns a list containing the names of the entries in the directory given by path.     
         files = os.listdir(path = ".")
         flag = False
         for f in files:
