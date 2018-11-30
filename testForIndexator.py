@@ -29,7 +29,7 @@ class IndexTest(unittest.TestCase):
             elif f.startswith('database'):
                 if f == 'database':
                     flag = True
-        self.assertEqual(flag, True)
+        self.assertTrue(flag)
         db_dict = dict(shelve.open(db_filename))
         standart_result = {'Baikal':{'test.txt': Position(0,6)}}
         self.assertEqual(db_dict, standart_result)
@@ -48,7 +48,7 @@ class IndexTest(unittest.TestCase):
             elif f.startswith('database'):
                 if f == 'database':
                     flag = True
-        self.assertEqual(flag, True)
+        self.assertTrue(flag)
         db_dict = dict(shelve.open(db_filename))
         standart_result = {'lake': {'test2.txt': Position(12, 16)},
                            'a': {'test2.txt': Position(10, 11)},
