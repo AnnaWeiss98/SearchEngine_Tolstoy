@@ -10,7 +10,7 @@ class Token(object):  # example, part of token's klass
     """
     Class of tokens taken from a given text
     """
-    def __init__(self,position,s):  # constructor, self-object,others atr
+    def __init__(self,position,s):  # constructor
         """
         Constructor for token.
         @param position: position is an index of the first element of token
