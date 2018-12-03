@@ -57,3 +57,4 @@ class IndexTest(unittest.TestCase):
                            'test.txt': Position(0, 6)}}
         self.assertEqual(db_dict, standart_result)
         os.remove('test2.txt')
+        #helloworld
