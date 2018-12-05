@@ -7,9 +7,8 @@ class IndexTest(unittest.TestCase):
     def setUp(self):
         self.x = Indexator()
     def tearDown(self):
-        files = os.listdir(path = ".")
+        files = os.listdir(path=".")
          for f in files:
-            if f.startswith('database.'):
                 if f == 'database.dat':
                     os.remove(f)
                 if f == 'database.dir':
