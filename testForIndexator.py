@@ -6,6 +6,19 @@ import os
 class IndexTest(unittest.TestCase):
     def setUp(self):
         self.x = Indexator()
+    def tearDown(self):
+        files = os.listdir(path = ".")
+         for f in files:
+            if f.startswith('database.'):
+                if f == 'database.dat':
+                    os.remove(f)
+                if f == 'database.dir':
+                    os.remove(f)
+                if f == 'database.bak':
+                    os.remove(f)
+            elif f.startswith('database'):
+                if f == 'database':
+                    os.remove(f)
 
     def test_not_file_name(self):
         with self.assertRaises(ValueError):
