@@ -156,7 +156,7 @@ class Tokenizer(object):
             raise ValueError('Input must be str !')
         position = 0
         for i,c in enumerate(strim):
-            if self.get_type(c) != i>0 and self.get_type(strim[i-1]):
+            if i>0 and self.get_type(c) != self.get_type(strim[i-1]):
                 p = self.get_type(strim[i-1])
                 s = strim[position:i]  # representation of string
                 position=i
@@ -166,7 +166,6 @@ class Tokenizer(object):
         condition for alphabetic symbol standing without nonalphabetic symbol after it
         it is important for the end of text
         """
-        if self.get_type(c):
             p = self.get_type(c)
             s = strim[position:i+1]
             t = Token_1(s,p)
