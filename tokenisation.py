@@ -27,9 +27,9 @@ class Token(object):  # example, part of token's klass
         return self.s+'_'+str(self.position)
 
 
-class Token_1 (Token):  # example, part of token's klass
+class Token_with_types (Token):  # example, part of token's klass
     """
-    Class of tokens taken from a given text
+    Class of tokens with types taken from a given text
     """
     def __init__(self,s,t):  # constructor
         """
