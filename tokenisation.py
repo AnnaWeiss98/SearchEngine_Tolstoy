@@ -27,22 +27,21 @@ class Token(object):  # example, part of token's klass
         return self.s+'_'+str(self.position)
 
 
-class Token_with_types (Token):  # example, part of token's klass
+class Token_with_types (Token):
     """
     Class of tokens with types taken from a given text
     """
     def __init__(self,s,t):  # constructor
         """
-        Constructor for token.
-        @param position: position is an index of the first element of token
+        Constructor for token with type.
         @param s: s is a presentation of token's string
+        @param t: t is a type
         @return: token
         """
         self.s = s  # write the meaning of variable
         self.t = t # type
     def __repr__(self):
         """
-        a function that asign numbers to tokens
         this function returns token and its type
         """
         
