@@ -31,13 +31,15 @@ class Token_with_types (Token):
     """
     Class of tokens with types taken from a given text
     """
-    def __init__(self,s,t):  # constructor
+    def __init__(self,position,s,t):  # constructor
         """
         Constructor for token with type.
+        @param position: position is an index of the first element of token
         @param s: s is a presentation of token's string
         @param t: t is a type
         @return: token
         """
+        self.position = position  # token's position in the text
         self.s = s  # write the meaning of variable
         self.t = t # type
     def __repr__(self):
@@ -45,7 +47,7 @@ class Token_with_types (Token):
         this function returns token and its type
         """
         
-        return self.s+'_'+str(self.t)
+        return self.s+'_'+str(self.position.t)
     
    
 class Tokenizer(object):
