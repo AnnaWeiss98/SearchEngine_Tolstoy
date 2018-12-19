@@ -38,6 +38,10 @@ class IndexTest(unittest.TestCase):
         os.remove('test.txt')
 
     def test_database_continued(self):
+        file = open('test.txt', 'w')
+        file.write('Baikal')
+        file.close()
+        self.x.prescribe_index('test.txt')
         file = open('test2.txt', 'w')
         file.write('Baikal is a lake')
         file.close()
@@ -52,13 +56,14 @@ class IndexTest(unittest.TestCase):
                     flag = True
         self.assertEqual(flag, True)
         db_dict = dict(self.x.db)
-        standart_result = {'lake': {'test2.txt': [Position(12, 16, 0)]},
-                           'a': {'test2.txt': [Position(10, 11, 0)]},
+        standart_result = {'Baikal': {'test2.txt': [Position(0, 6, 0)],
+                           'test.txt': [Position(0, 6, 0)]},
                            'is': {'test2.txt': [Position(7, 9, 0)]},
-                           'Baikal': {'test2.txt': [Position(0, 6, 0)],
-                           'test.txt': [Position(0, 6, 0)]}}
+                           'a': {'test2.txt': [Position(10, 11, 0)]},
+                           'lake': {'test2.txt': [Position(12, 16, 0)]}}
         self.assertEqual(db_dict, standart_result)
         os.remove('test2.txt')
+        os.remove('test.txt')
 
     def tearDown(self):
         del self.x

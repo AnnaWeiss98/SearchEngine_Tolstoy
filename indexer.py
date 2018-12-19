@@ -37,12 +37,16 @@ class Indexer(object):
         self.db = shelve.open(path, writeback=True)
 
     def prescribe_index(self, path):
+        if not isinstance(path, str):
+            raise ValueError('Input has an unappropriate type,it should be str')
+        
         tokenizer = Tokenizer()
         f = open(path, 'r')
         for i, string in enumerate(f):
             tokens = tokenizer.tokenize_generator_type(string)
             for token in tokens:
-                self.db.setdefault(token.s, {}).setdefault(path, []).append(Position.from_token(token, i))
+                if token.t == 'A' or token.t == 'D':
+                    self.db.setdefault(token.s, {}).setdefault(path, []).append(Position.from_token(token, i))
         f.close()
                                                                             
     def __del__(self):
