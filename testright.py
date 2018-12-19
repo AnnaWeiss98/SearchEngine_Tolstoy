@@ -19,8 +19,10 @@ class TestMyCode (unittest.TestCase):
         self.assertEqual(len(result), 15)
         self.assertEqual(result[0].s, ' ')
         self.assertEqual(result[0].t, 'S')
+        self.assertEqual(result[0].position, 1)
         self.assertEqual(result[14].s,'sun')
         self.assertEqual(result[14].t, 'A')
+        self.assertEqual(result[14].position, 20)
         
     def test_MyError_type_number(self):
         with self.assertRaises(ValueError):
