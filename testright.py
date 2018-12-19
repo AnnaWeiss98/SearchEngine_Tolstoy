@@ -15,8 +15,8 @@ class TestMyCode (unittest.TestCase):
         self.assertIsInstance(result, Generator)
         
     def test_type(self):
-        result = list(self.x.tokenize_generator_type(' h50 ht ? 20 h d sun')
-        self.assertEqual(len(result), 15)
+        result = list(self.x.tokenize_generator_type(' h50 ht ? 20 h d sun'))
+        self.assertEqual(len(result), 20)
         self.assertEqual(result[0].s, ' ')
         self.assertEqual(result[0].t, 'S')
         self.assertEqual(result[0].position, 1)
