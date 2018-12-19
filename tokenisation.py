@@ -10,7 +10,7 @@ class Token(object):  # example, part of token's klass
     """
     Class of tokens taken from a given text
     """
-    def __init__(self,position,s):  # constructor
+    def __init__(self,position,s):  # constructor, self-object,others atr
         """
         Constructor for token.
         @param position: position is an index of the first element of token
@@ -27,16 +27,15 @@ class Token(object):  # example, part of token's klass
         return self.s+'_'+str(self.position)
 
 
-class Token_with_types (Token):
+class Token_1 (Token):  # example, part of token's klass
     """
-    Class of tokens with types taken from a given text
+    Class of tokens taken from a given text
     """
-    def __init__(self,position,s,t):  # constructor
+    def __init__(self,position,s,t):  # constructor, self-object,others atr
         """
-        Constructor for token with type.
+        Constructor for token.
         @param position: position is an index of the first element of token
         @param s: s is a presentation of token's string
-        @param t: t is a type
         @return: token
         """
         self.position = position  # token's position in the text
@@ -44,10 +43,11 @@ class Token_with_types (Token):
         self.t = t # type
     def __repr__(self):
         """
+        a function that asign numbers to tokens
         this function returns token and its type
         """
         
-        return self.s+'_'+str(self.position.t)
+        return self.s+'_'+str(self.t)
     
    
 class Tokenizer(object):
@@ -73,7 +73,7 @@ class Tokenizer(object):
             inToken = False
         for i,c in enumerate(strim):
             if c.isalpha()and not strim[i-1].isalpha():
-                position = i
+                position=i
                 inToken = True
             if not c.isalpha()and strim[i-1].isalpha() and inToken:
                 s = strim[position:i]  # срез
@@ -103,7 +103,7 @@ class Tokenizer(object):
         """
         if not isinstance(strim,str):
             raise ValueError('Input has an unappropriate type,it should be str')
-        position = 0
+        position=0
         if strim[0].isalpha():
             inToken = True
         else:
@@ -111,7 +111,7 @@ class Tokenizer(object):
         for i,c in enumerate(strim):
             if c.isalpha()and not strim[i-1].isalpha():
                 position = i
-                inToken = True
+                inToken=True
             if not c.isalpha()and strim[i-1].isalpha() and inToken:
                 s = strim[position:i]  # срез
                 t = Token(position,s)  
@@ -156,21 +156,28 @@ class Tokenizer(object):
         if not isinstance(strim,str):
             raise ValueError('Input must be str !')
         position = 0
+        last_type = ""
         for i,c in enumerate(strim):
-            if i>0 and self.get_type(c) != self.get_type(strim[i-1]):
-                p = self.get_type(strim[i-1])
+            this_type = self.get_type(c) 
+            if this_type != last_type and i>0:
                 s = strim[position:i]  # representation of string
-                position=i
-                t = Token_1(s,p)  
+                t = Token_1(position,s,last_type)  
                 yield t
+                position=i
+            last_type=this_type
         """
         condition for alphabetic symbol standing without nonalphabetic symbol after it
         it is important for the end of text
         """
-            p = self.get_type(c)
-            s = strim[position:i+1]
-            t = Token_1(s,p)
-            yield t
-x = Tokenizer()
-for i in x.tokenize_generator_type(' h50 ht ? 20 h d sun'):
-    print(i) 
+        s = strim[position:i+1]
+        t = Token_1(position,s,this_type)
+        yield t
+
+        
+def main():
+    x = Tokenizer()
+    for i in x.tokenize_generator_type(' h50 ht ? 20 h d sun'):
+        print(i)
+
+if __name__ == "__main__":
+    main()

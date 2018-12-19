@@ -16,13 +16,14 @@ class TestMyCode (unittest.TestCase):
         
     def test_type(self):
         result = list(self.x.tokenize_generator_type(' h50 ht ? 20 h d sun'))
-        self.assertEqual(len(result), 20)
+        print(result)
+        self.assertEqual(len(result), 15)
         self.assertEqual(result[0].s, ' ')
         self.assertEqual(result[0].t, 'S')
-        self.assertEqual(result[0].position, 1)
+        self.assertEqual(result[0].position, 0)
         self.assertEqual(result[14].s,'sun')
         self.assertEqual(result[14].t, 'A')
-        self.assertEqual(result[14].position, 20)
+        self.assertEqual(result[14].position, 17)
         
     def test_MyError_type_number(self):
         with self.assertRaises(ValueError):
