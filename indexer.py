@@ -18,7 +18,7 @@ class Position(object):
     @classmethod #bespeak to class, not to exemplar
     def from_token(cls, token, string):
         '''
-        forcreating a class Position with token
+        for creating a class Position with token
         '''
         return cls(token.position, token.position + len(token.s), string)
     def __eq__(self, obj):
