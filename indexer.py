@@ -51,3 +51,19 @@ class Indexer(object):
                                                                             
     def __del__(self):
         self.db.close()
+        
+def main():
+    x = Indexer('database')
+    f = open('text.txt', 'w')
+    f.write(' h50 ht ? 20 h d sun')
+    f.close()
+    x.prescribe_index('text.txt')
+    del x
+    os.remove('text.txt')
+    print(dict(shelve.open('database')))
+    for f in os.listdir(os.getcwd()):
+        if f == 'database' or f.startswith('database.'):
+            os.remove(f)
+               
+if __name__ == "__main__":
+    main()
