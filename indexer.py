@@ -53,7 +53,7 @@ class Indexer(object):
         self.db.close()
         
 def main():
-    '''x = Indexer('database')
+    x = Indexer('database')
     f = open('text.txt', 'w')
     f.write(' h50 ht ? 20 h d sun')
     f.close()
@@ -63,20 +63,7 @@ def main():
     print(dict(shelve.open('database')))
     for f in os.listdir(os.getcwd()):
         if f == 'database' or f.startswith('database.'):
-            os.remove(f)'''
+            os.remove(f)
                
-    x = Indexer('tolstoy_database') 
-    print("indexing tolstoy1")
-    x.prescribe_index('tolstoy1.txt') 
-    print("indexing tolstoy2")
-    x.prescribe_index('tolstoy2.txt') 
-    print("indexing tolstoy3")
-    x.prescribe_index('tolstoy3.txt') 
-    print("indexing tolstoy4")
-    x.prescribe_index('tolstoy4.txt') 
-    print("done. printing the database")
-
-    print(dict(x.db))
-    del x 
 if __name__ == "__main__":
     main()
