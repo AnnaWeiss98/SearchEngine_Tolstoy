@@ -27,6 +27,9 @@ class Position(object):
         same first and last symbol
         '''
         return self.string==obj.string and self.start==obj.start and self.end == obj.end
+    def __repr__(self):
+        return "(" + str(self.start) + ", " + str(self.end) + ", " + str(self.string)+")"
+        
 
         
 class Indexer(object):
