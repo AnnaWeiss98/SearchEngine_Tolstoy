@@ -48,6 +48,7 @@ class SearchEngine(object):
             final_dict[f] = []
             for token in searchlist:
                 final_dict[f].extend(self.database[token][f])
+            final_dict[f].sort()
         return final_dict
 
                   

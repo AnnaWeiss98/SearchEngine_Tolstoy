@@ -27,6 +27,13 @@ class Position(object):
         same first and last symbol
         '''
         return self.string==obj.string and self.start==obj.start and self.end == obj.end
+    def __lt__(self,obj): #self less than obj
+        a = False
+        if self.string < obj.string:
+            a = True
+        else:
+            if self.start < obj.start:
+                a = True
     def __repr__(self):
         return "(" + str(self.start) + ", " + str(self.end) + ", " + str(self.string)+")"
         
