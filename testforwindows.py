@@ -3,10 +3,10 @@ from tokenwindow import Windows
 import os
 
 s_sun='''sun window tree apple, juse border films 23 45good
-[4, 11, 16] [1, 0, 2] 20'''
+[4, 11, 16][1, 0, 2]'''
 
 s_sun_films='''sun window tree apple, juse border films 23 45good
-[4, 11, 16, 23, 28, 41, 44, 46] [1, 0, 2] [1, 35, 39] 49'''
+[4, 11, 16, 23, 28, 41, 44, 46][1, 0, 2][1, 35, 39]'''
 
 idealdict = {'sun':  s_sun,
              'sun_films': s_sun_films}
