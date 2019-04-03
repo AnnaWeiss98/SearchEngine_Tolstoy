@@ -31,6 +31,12 @@ class Token_1 (Token):  # example, part of token's klass
     """
     Class of tokens taken from a given text
     """
+    def __eq__(self, obj):
+        '''
+        check if two tokens are equal (it is so when they have the
+        same first and last symbol
+        '''
+        return self.s==obj.s and self.position==obj.position
     def __init__(self,position,s,t):  # constructor, self-object,others atr
         """
         Constructor for token.
