@@ -36,7 +36,7 @@ class WindowsTest (unittest.TestCase):
     def tearDown(self):
         file_list = os.listdir(path=".")
         for i in file_list:
-            if i in ('test_window_one.txt'; 'test_window_two.txt'; 'test_window_three.txt'):
+            if i in {'test_window_one.txt', 'test_window_two.txt', 'test_window_three.txt'}:
                 os.remove(i)
 
     def test_wrong_input_error(self):
