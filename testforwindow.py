@@ -36,7 +36,7 @@ class WindowsTest (unittest.TestCase):
     def tearDown(self):
         file_list = os.listdir(path=".")
         for i in file_list:
-            if i == 'test_window_one.txt' or i == 'test_window_two.txt' or i == 'test_window_three.txt':
+            if i in ('test_window_one.txt'; 'test_window_two.txt'; 'test_window_three.txt'):
                 os.remove(i)
 
     def test_wrong_input_error(self):
@@ -62,9 +62,9 @@ class WindowsTest (unittest.TestCase):
         files = ['test_window_one.txt']
         winn = Window_searcher(files, 'database', 1)
         res = winn.find_window('sun')
-        self.assertEqual(len(res['test_window_one.txt']),1)
+        self.assertEqual(len(res['test_window_one.txt']), 1)
         result = res['test_window_one.txt'][0]
-        win = TokenWindow(self.strr,Position(0, 3, 0),0,10)
+        win = TokenWindow(self.strr,Position(0, 3, 0), 0, 10)
         self.assertEqual(result.allString, win.allString)
         self.assertEqual(result.token, win.token)
         self.assertEqual(result.win_start, win.win_start)
@@ -75,9 +75,9 @@ class WindowsTest (unittest.TestCase):
         files = ['test_window_one.txt']
         winn = Window_searcher(files, 'database', 2)
         res = winn.find_window('tree')
-        self.assertEqual(len(res['test_window_one.txt']),1)
+        self.assertEqual(len(res['test_window_one.txt']), 1)
         result = res['test_window_one.txt'][0]
-        win = TokenWindow(self.strr, Position(11, 15, 0),0,27)
+        win = TokenWindow(self.strr, Position(11, 15, 0), 0, 27)
         self.assertEqual(result.allString, win.allString)
         self.assertEqual(result.token, win.token)
         self.assertEqual(result.win_start, win.win_start)
@@ -88,9 +88,9 @@ class WindowsTest (unittest.TestCase):
         files = ['test_window_one.txt']
         winn = Window_searcher(files, 'database', 1)
         res = winn.find_window('good')
-        self.assertEqual(len(res['test_window_one.txt']),1)
+        self.assertEqual(len(res['test_window_one.txt']), 1)
         result = res['test_window_one.txt'][0]
-        win = TokenWindow(self.strr, Position(46, 50, 0),44,50)
+        win = TokenWindow(self.strr, Position(46, 50, 0), 44, 50)
         self.assertEqual(result.allString, win.allString)
         self.assertEqual(result.token, win.token)
         self.assertEqual(result.win_start, win.win_start)
@@ -102,9 +102,9 @@ class WindowsTest (unittest.TestCase):
         files = ['test_window_two.txt']
         winn = Window_searcher(files, 'database', 2)
         res = winn.find_window('нашу')
-        self.assertEqual(len(res['test_window_two.txt']),1)
+        self.assertEqual(len(res['test_window_two.txt']), 1)
         result = res['test_window_two.txt'][0]
-        win = TokenWindow(self.strr2, Position(13, 17, 0),0,31)
+        win = TokenWindow(self.strr2, Position(13, 17, 0), 0, 31)
         self.assertEqual(result.allString, win.allString)
         self.assertEqual(result.token, win.token)
         self.assertEqual(result.win_start, win.win_start)
@@ -116,9 +116,9 @@ class WindowsTest (unittest.TestCase):
         files = ['test_window_three.txt']
         winn = Window_searcher(files, 'database', 1)
         res = winn.find_window('Вторая')
-        self.assertEqual(len(res['test_window_three.txt']),1)
+        self.assertEqual(len(res['test_window_three.txt']), 1)
         result = res['test_window_three.txt'][0]
-        win = TokenWindow(self.strr4, Position(0, 6, 1),0,13)
+        win = TokenWindow(self.strr4, Position(0, 6, 1), 0, 13)
         self.assertEqual(result.allString, win.allString)
         self.assertEqual(result.token, win.token)
         self.assertEqual(result.win_start, win.win_start)
