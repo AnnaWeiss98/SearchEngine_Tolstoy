@@ -6,19 +6,19 @@ from searchengine import SearchEngine
 
 class TokenWindow(object):
     """
-    konstructor
+    constructor
     """
     def __init__(self, allString ,toc, start, end):
-
+        """
+        The function will be called when accessing an instance of a
+        class, for example. print(TokenWindow) 
+        """
         self.allString  = allString # string with required token
         self.token = toc #  required token
         self.win_start = start
         self.win_end   = end
 
-    """
-    The function will be called when accessing an instance of a
-    class, for example. print(TokenWindow) 
-    """
+   
     def __repr__(self):
 
         s= '{}, {}, {}, {}'.format(self.allString, self.token, self.win_start, self.win_end)
@@ -43,7 +43,7 @@ class Window_searcher(object):
 
     """
     Constructor (method that creates an instance of the class)
-     Input Parameters: File List, Token Base, Window Width
+    Input Parameters: File List, Token Base, Window Width
     """
     def __init__(self, files, database, window_len):
 
