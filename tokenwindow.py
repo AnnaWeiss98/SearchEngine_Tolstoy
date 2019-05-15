@@ -1,12 +1,14 @@
-import io, os
+import io
+import os
 import shelve
 from indexer import Position
 from indexer import Indexer
+from tokenisation import Tokenizer
 from searchengine import SearchEngine
 
 class TokenWindow(object):
     """
-    constructor
+    konstructor
     """
     def __init__(self, allString ,toc, start, end):
         """
@@ -15,12 +17,11 @@ class TokenWindow(object):
         """
         self.allString  = allString # string with required token
         self.token = toc #  required token
-        self.win_start = start
+        self.win_start = start 
         self.win_end   = end
 
-   
     def __repr__(self):
-
+        
         s= '{}, {}, {}, {}'.format(self.allString, self.token, self.win_start, self.win_end)
         """
         return string for output
@@ -31,109 +32,117 @@ class TokenWindow(object):
     def __eq__(self, obj):
         '''
         check if two tokens are equal (it is so when they have the
-        same first and last symbol)
+        same first and last symbol
         '''
         return self.token == obj.token and self.win_start==obj.win_start and self.win_end == obj.win_end
 
-
-class Window_searcher(object):
+class Window_searcher(SearchEngine):
     """
     Class with methods for searching windows in files from a list
     """
+    
+    def __init__(self, database, window_len, files = None, path = None):
+        """
+        Constructor (method that creates an instance of the class)
+        Input Parameters: File List, Token Base, Window Width
+        """
 
-    """
-    Constructor (method that creates an instance of the class)
-    Input Parameters: File List, Token Base, Window Width
-    """
-    def __init__(self, files, database, window_len):
-
-        self.files = files #list of files for analysis
-        self.db = database
+        self.files = files # list of files for analysis
+        self.path = path   #  path (папка) with textfiles
         self.window_len = window_len
+        self.db_name = database
 
-        for path in self.files:
-            indexator = Indexer(self.db+'.'+path)
-            indexator.prescribe_index_v2(path)
-            del indexator
+        indexator = Indexer(self.db_name)
+        
+        file_list = []
+        
+        if self.files is not None:
+           file_list.extend(self.files)
+
+        if self.path is not None: 
+           for f in os.listdir(path=self.path):
+               file_list.append(self.path+f)
+
+        for p in file_list:
+            print ("Indexing file: ", p)    
+            indexator.prescribe_index(p)
+        del indexator
+
+        SearchEngine.__init__(self, database)
+
          
 
     def __del__(self):  # Class destructor
-      self.del_db()
-
-    def  del_db (self):
 
         file_list = os.listdir(path=".")
         for i in file_list:
-            if i == self.db:
+            if i == self.db_name:
                 database_exists = True
                 os.remove(i)
-            elif i.startswith(self.db+'.'):
+            elif i.startswith(self.db_name+'.'):
                 database_exists = True
                 os.remove(i)
 
 
-    """
-    Multi word search function
-    """
     def find_window(self, findstr):
-
+        """
+        Multi word search function
+        """
         if not isinstance(findstr, str):
             raise ValueError
         if not findstr:
             return {}
 
-        windows = {}
-
-        for path in self.files:
+        windows = {} # return windows
+        tokenizer = Tokenizer() # for tokenising the string from file
+        result_dict = self.multiple_search(findstr)  # search
+        
+        for file_key in result_dict.keys():
             wins = []
-            search = SearchEngine(self.db+'.'+path)
-
-            f = open(path, 'r')
+            f = open(file_key, 'r')
             file_lines = f.readlines()
+            
+            result_list = result_dict[file_key]
+            for result_token in result_list:
+
+                position = result_token.start
+                string_index = result_token.string
+                token_list = [token for token in tokenizer.tokenize_generator_type(file_lines[string_index]) if token.t in ['A','D']]
+                indx = 0 
+                for token in token_list:
+                   if token.position == position:
+                        break
+                   indx +=1
+
+                if indx < len(token_list):                   
+                     """
+                     calculate the beginning and end of the window
+                     """
+                     sta = indx - self.window_len if (indx - self.window_len) > 0 else 0
+                     en = indx + self.window_len if (self.window_len + indx) < len(token_list) else -1
+                     wins.append (TokenWindow (file_lines[string_index], result_token, token_list[sta].position, token_list[en].position+len(token_list[en].s)))
+                                  
+ 
             f.close()
                           
-            search_dict = search.multiple_search(findstr)
-            if len(search_dict) == 0:
-               self.del_db()
-               continue
-
-            search_tokens = list(search_dict.values())
-
-            for s in search_tokens:
-                for st in s:
-                    list_tokens = []
-                    for t in (list(search.database.values())):
-                          if st.string in t.keys():
-                                list_tokens.extend(t[st.string])
-                    list_tokens.sort()  
-
-                    indx = list_tokens.index(st) 
-
-                    # calculate the beginning and end of the window
-                    sta = indx - self.window_len if (indx - self.window_len) > 0 else 0
-                    en = indx + self.window_len if (self.window_len + indx) < len(list_tokens) else -1
-                    wins.append ( TokenWindow (file_lines[st.string], st, list_tokens[sta].start, list_tokens[en].end) )
-
-
             if len(wins) > 0:
-               windows[path] = wins
+               windows[file_key] = wins
         		 
         return windows
 
-
 def main():
 
-    #files = ['test.txt']
-    files = ['tolstoy4.txt']
-    win = Window_searcher(files, 'database', 2)
+    win = Window_searcher('database', 2, path='.\docs\\')
     while True:
         findstr = input("Слово для поиска: ")
         if findstr == "exit":
             break
 
         res = win.find_window(findstr)
-        for v in res.values():
-            print (v)
+        for k in res:
+            print(k)
+            for v in res[k]:
+                print(v)
 
 if __name__ == "__main__":
     main()
