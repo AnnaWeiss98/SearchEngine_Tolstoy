@@ -4,14 +4,14 @@ import os
 
 
 class TokenWindow(object):
-    def __init__(self, allString, toc, start, end):
+    def __init__(self, allString, pos, start, end):
         self.allString = allString  
-        self.token = toc  
+        self.positions = pos  
         self.win_start = start  
         self.win_end = end  
 
     def __repr__(self):
-        s = '{}, {}, {}, {}'.format(self.allString, str(self.token), self.win_start, self.win_end)
+        s = '{}, {}, {}, {}'.format(self.allString, str(self.positions), self.win_start, self.win_end)
 
         return s
 
@@ -20,7 +20,7 @@ class TokenWindow(object):
         check if two tokens are equal (it is so when they have the
         same first and last symbol
         '''
-        return self.token == obj.token and self.win_start == obj.win_start and self.win_end == obj.win_end
+        return self.positions == obj.positions and self.win_start == obj.win_start and self.win_end == obj.win_end
 
     def window_is_junction(self, obj):
         return (self.win_start <= obj.win_end and
@@ -135,15 +135,23 @@ class SearchEngine(object):
         window_dict = {}
 
         for f, wins in _dict.items():
-            pr_win = None
+            pr_win = None # previous window
             for win in wins:
                 if pr_win is not None and pr_win.window_is_junction(win):
-                    for tok in win.token:
-                        if tok not in pr_win.token:
-                            pr_win.token.append(tok)
+                    for pos in win.positions:
+                        if pos not in pr_win.positions:
+                            pr_win.positions.append(pos)
+                            """
+                            he looks at whether the pr_win variable is defined,
+                            if yes, then checks whether the windows intersect,
+                            if yes then intersects. otherwise, it looks again
+                            whether the pr_win variable is defined; if so, it
+                            adds it to the window array. pr_win equates to the
+                            current window
+                            """
 
-                    start = min(pr_win.win_start, win.win_start)
-                    end = max(pr_win.win_end, win.win_end)
+                    pr_win.start = min(pr_win.win_start, win.win_start)
+                    pr_win.end = max(pr_win.win_end, win.win_end)
                 else:
                     if pr_win is not None:
                         window_dict.setdefault(f, []).append(pr_win)
