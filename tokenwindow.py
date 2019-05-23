@@ -9,11 +9,11 @@ def main():
         if findstr == "exit":
             break
 
-        res = win.find_window(findstr, 2)
+        res = win.find_supplemented_window(findstr, 2)
         for k in res:
-            print(k) # k - keys
+            print(k)
             for v in res[k]:
-                print(v) # v - value from list
+                print(v)
 
 if __name__ == "__main__":
     main()
