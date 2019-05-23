@@ -1,14 +1,15 @@
 from tokenisation import Tokenizer
 import shelve
 import os
+import re
 
 
 class TokenWindow(object):
     def __init__(self, allString, pos, start, end):
-        self.allString = allString  
-        self.positions = pos  
-        self.win_start = start  
-        self.win_end = end  
+        self.allString = allString  # all the line
+        self.positions = pos  # list of Positions
+        self.win_start = start  # start window
+        self.win_end = end  # end window
 
     def __repr__(self):
         s = '{}, {}, {}, {}'.format(self.allString, str(self.positions), self.win_start, self.win_end)
@@ -135,7 +136,7 @@ class SearchEngine(object):
         window_dict = {}
 
         for f, wins in _dict.items():
-            pr_win = None # previous window
+            pr_win = None
             for win in wins:
                 if pr_win is not None and pr_win.window_is_junction(win):
                     for pos in win.positions:
@@ -150,12 +151,34 @@ class SearchEngine(object):
                             current window
                             """
 
-                    pr_win.start = min(pr_win.win_start, win.win_start)
-                    pr_win.end = max(pr_win.win_end, win.win_end)
+                    pr_win.win_start = min(pr_win.win_start, win.win_start)
+                    pr_win.win_end = max(pr_win.win_end, win.win_end)
                 else:
                     if pr_win is not None:
                         window_dict.setdefault(f, []).append(pr_win)
                     pr_win = win
             window_dict.setdefault(f, []).append(pr_win)
 
+        return window_dict
+
+    def find_supplemented_window(self, findstr, window_len):
+
+        window_dict = self.find_window(findstr, window_len)
+        re_right = re.compile(r'[.!?] [A-ZА-Я]')
+        re_left = re.compile(r'[A-ZА-Я] [.!?]')
+
+        for f, wins in window_dict.items():
+            for win in wins:
+                r = win.allString[win.win_end:]
+                l = win.allString[:win.win_start + 1][::-1]
+                if l:
+                    try:
+                        win.win_start = win.win_start - re_left.search(l).start()
+                    except:
+                        win.win_start = 0
+                if r:
+                    try:
+                        win.win_end += re_right.search(r).start() + 1
+                    except:
+                        win.win_end = len(win.allString)
         return window_dict
