@@ -81,7 +81,7 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-    def find_window(self, findstr, window_len):
+    def find_window(self, findstr, window_len = 3):
 
         if not isinstance(findstr, str):
             raise ValueError
@@ -111,7 +111,7 @@ class SearchEngine(object):
                 for token in tokenizer.tokenize_generator_type(left_context):
                     if token.t in ['A', 'D']:
                         i += 1
-                    if i == window_len:
+                    if i == window_len + 1:
                         break
 
                 start = result_token.end - token.position - len(token.s)
@@ -120,7 +120,7 @@ class SearchEngine(object):
                 for token in tokenizer.tokenize_generator_type(right_context):
                     if token.t in ['A', 'D']:
                         i += 1
-                    if i == window_len:
+                    if i == window_len + 1:
                         break
 
                 end = result_token.start + token.position + len(token.s)
