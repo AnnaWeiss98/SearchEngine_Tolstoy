@@ -1,7 +1,34 @@
 import unittest
-from tokenwindow import Window_searcher,TokenWindow
+from searchengine import SearchEngine,TokenWindow
 from indexer import Position
 import os
+
+idealdict = {'sun': {'test_window_one.txt': [Position(0, 3, 0)]},
+             'window': {'test_window_one.txt': [Position(4, 10, 0)]},
+             'tree': {'test_window_one.txt': [Position(11, 15, 0)]},
+             'apple': {'test_window_one.txt': [Position(16, 21, 0)]},
+             'juse': {'test_window_one.txt': [Position(23, 27, 0)]},
+             'border': {'test_window_one.txt': [Position(28, 34, 0)]},
+             'films': {'test_window_one.txt': [Position(35, 40, 0)]},
+             '23': {'test_window_one.txt': [Position(41, 43, 0)]},
+             '45': {'test_window_one.txt': [Position(44, 46, 0)]},
+             'good': {'test_window_one.txt': [Position(46, 50, 0)]},
+             'Мы': {'test_window_two.txt': [Position(0, 2, 0)]},
+             'тестируем': {'test_window_two.txt': [Position(3, 12, 0)]},
+             'нашу': {'test_window_two.txt': [Position(13, 17, 0)]},
+             'программу': {'test_window_two.txt': [Position(18, 27, 0)]},
+             'для': {'test_window_two.txt': [Position(28, 31, 0)],
+                     'test_window_three.txt': [Position(14, 17, 0),
+                                               Position(14, 17, 1)]},
+             'работы': {'test_window_two.txt': [Position(32, 38, 0)]},
+             'с': {'test_window_two.txt': [Position(39, 40, 0)]},
+             'окнами': {'test_window_two.txt': [Position(41, 47, 0)]},
+             'Первая': {'test_window_three.txt': [Position(0, 6, 0)]},
+             'строка': {'test_window_three.txt': [Position(7, 13, 0),
+                                                  Position(7, 13, 1)]},
+             'тестов': {'test_window_three.txt': [Position(18, 24, 0),
+                                                  Position(18, 24, 1)]},
+             'Вторая': {'test_window_three.txt': [Position(0, 6, 1)]}}
 
 class WindowsTest (unittest.TestCase):
 
@@ -33,97 +60,81 @@ class WindowsTest (unittest.TestCase):
         self.test_file.write(self.strr4)
         self.test_file.close()
 
+        self.x = SearchEngine("test_db")
+        self.x.database.update(idealdict)
+
     def tearDown(self):
+        del self.x
         file_list = os.listdir(path=".")
         for i in file_list:
-            if i in {'test_window_one.txt', 'test_window_two.txt', 'test_window_three.txt'}:
+            if i == 'test_window_one.txt' or i == 'test_window_two.txt' or i == 'test_window_three.txt':
+                os.remove(i)
+            if i.startswith('test_db.'):
                 os.remove(i)
 
     def test_wrong_input_error(self):
         with self.assertRaises(ValueError):
             files = ['test_window_one.txt']
-            win = Window_searcher(files, 'database', 2)
-            result = win.find_window(123)
+            win = self.x.find_window(files, 3)
 
     def test_absent_key(self):
-        files = ['test_window_one.txt']
-        win = Window_searcher(files, 'database', 2)
-        result = win.find_window('zzzz')
+        result = self.x.find_window('zzzz')
         self.assertEqual(result, {})
 
     def test_empty_string(self):
-        files = ['test_window_one.txt']
-        win = Window_searcher(files, 'database', 2)
-        result = win.find_window('')
+        result = self.x.find_window('')
         self.assertIsInstance(result, dict)
         self.assertEqual(result, {})
 
-    def test_get_window_begin(self):
-        files = ['test_window_one.txt']
-        winn = Window_searcher(files, 'database', 1)
-        res = winn.find_window('sun')
-        self.assertEqual(len(res['test_window_one.txt']), 1)
-        result = res['test_window_one.txt'][0]
-        win = TokenWindow(self.strr,Position(0, 3, 0), 0, 10)
-        self.assertEqual(result.allString, win.allString)
-        self.assertEqual(result.token, win.token)
-        self.assertEqual(result.win_start, win.win_start)
-        self.assertEqual(result.win_end, win.win_end)
-        self.assertEqual(result, win)
+    def test_get_window_begin(self):       
+        result = self.x.find_window('sun', 1)
+        res = result['test_window_one.txt'][0]
+        win = TokenWindow(self.strr, [Position(0, 3, 0)], 0, 10)
+        ideal = {'test_window_one.txt': [win]}
+        self.assertEqual(res.allString, win.allString)
+        self.assertEqual(res, win)
+        self.assertEqual(result, ideal)
 
     def test_get_window_simple(self):
-        files = ['test_window_one.txt']
-        winn = Window_searcher(files, 'database', 2)
-        res = winn.find_window('tree')
-        self.assertEqual(len(res['test_window_one.txt']), 1)
-        result = res['test_window_one.txt'][0]
-        win = TokenWindow(self.strr, Position(11, 15, 0), 0, 27)
-        self.assertEqual(result.allString, win.allString)
-        self.assertEqual(result.token, win.token)
-        self.assertEqual(result.win_start, win.win_start)
-        self.assertEqual(result.win_end, win.win_end)
-        self.assertEqual(result, win)
+        result = self.x.find_window('tree', 2)
+        res = result['test_window_one.txt'][0]
+        win = TokenWindow(self.strr, [Position(11, 15, 0)], 0, 27)
+        ideal = {'test_window_one.txt': [win]}
+        
+        self.assertEqual(res.allString, win.allString)
+        self.assertEqual(res, win)
+        self.assertEqual(result, ideal)
 
     def test_get_window_end(self):
-        files = ['test_window_one.txt']
-        winn = Window_searcher(files, 'database', 1)
-        res = winn.find_window('good')
-        self.assertEqual(len(res['test_window_one.txt']), 1)
-        result = res['test_window_one.txt'][0]
-        win = TokenWindow(self.strr, Position(46, 50, 0), 44, 50)
-        self.assertEqual(result.allString, win.allString)
-        self.assertEqual(result.token, win.token)
-        self.assertEqual(result.win_start, win.win_start)
-        self.assertEqual(result.win_end, win.win_end)
-        self.assertEqual(result, win)
+        result = self.x.find_window('good', 1)
+        res = result['test_window_one.txt'][0]
+        win = TokenWindow(self.strr, [Position(46, 50, 0)], 44, 50)
+        ideal = {'test_window_one.txt': [win]}
+        
+        self.assertEqual(res.allString, win.allString)
+        self.assertEqual(res, win)
+        self.assertEqual(result, ideal)
 
-
-    def test_get_window_simple2(self):  #test for russian token
-        files = ['test_window_two.txt']
-        winn = Window_searcher(files, 'database', 2)
-        res = winn.find_window('нашу')
-        self.assertEqual(len(res['test_window_two.txt']), 1)
-        result = res['test_window_two.txt'][0]
-        win = TokenWindow(self.strr2, Position(13, 17, 0), 0, 31)
-        self.assertEqual(result.allString, win.allString)
-        self.assertEqual(result.token, win.token)
-        self.assertEqual(result.win_start, win.win_start)
-        self.assertEqual(result.win_end, win.win_end)
-        self.assertEqual(result, win)
+    def test_get_window_simple2(self):
+        result = self.x.find_window('нашу', 2)
+        res = result['test_window_two.txt'][0]
+        win = TokenWindow(self.strr2, [Position(13, 17, 0)], 0, 31)
+        ideal = {'test_window_two.txt': [win]}
+        
+        self.assertEqual(res.allString, win.allString)
+        self.assertEqual(res, win)
+        self.assertEqual(result, ideal)
 
 
     def test_get_window_simple_two_line(self):
-        files = ['test_window_three.txt']
-        winn = Window_searcher(files, 'database', 1)
-        res = winn.find_window('Вторая')
-        self.assertEqual(len(res['test_window_three.txt']), 1)
-        result = res['test_window_three.txt'][0]
-        win = TokenWindow(self.strr4, Position(0, 6, 1), 0, 13)
-        self.assertEqual(result.allString, win.allString)
-        self.assertEqual(result.token, win.token)
-        self.assertEqual(result.win_start, win.win_start)
-        self.assertEqual(result.win_end, win.win_end)
-        self.assertEqual(result, win)
+        result = self.x.find_window('Вторая', 1)
+        res = result['test_window_three.txt'][0]
+        win = TokenWindow(self.strr4, [Position(0, 6, 1)], 0, 13)
+        ideal = {'test_window_three.txt': [win]}
+       
+        self.assertEqual(res.allString, win.allString)
+        self.assertEqual(res, win)
+        self.assertEqual(result, ideal)
 
 if __name__== '__main__':
     unittest.main()
