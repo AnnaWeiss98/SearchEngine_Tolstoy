@@ -23,7 +23,7 @@ class TokenWindow(object):
         '''
         return self.positions == obj.positions and self.win_start == obj.win_start and self.win_end == obj.win_end
 
-    def window_is_junction(self, obj):
+    def window_is_junction(self, obj):  #checking whether windows are intersected
         return (self.win_start <= obj.win_end and
                 self.win_end >= obj.win_start and
                 obj.allString == self.allString)
@@ -129,9 +129,9 @@ class SearchEngine(object):
             if len(wins) > 0:
                 windows[file_key] = wins
 
-        return self.join_windows(windows)
+        return self.join_windows(windows) #call the crossing method
 
-    def join_windows(self, _dict):
+    def join_windows(self, _dict): #this method cross the windows
 
         window_dict = {}
 
