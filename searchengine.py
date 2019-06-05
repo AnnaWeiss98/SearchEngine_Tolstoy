@@ -6,6 +6,9 @@ import re
 
 class TokenWindow(object):
     def __init__(self, allString, pos, start, end):
+        """
+        Creates an instance of class TokenWindow given the values of its attributes
+        """
         self.allString = allString  # all the line
         self.positions = pos  # list of Positions
         self.win_start = start  # start window
@@ -24,6 +27,9 @@ class TokenWindow(object):
         return self.positions == obj.positions and self.win_start == obj.win_start and self.win_end == obj.win_end
 
     def window_is_junction(self, obj):
+        """
+        This method joins windows.
+        """
         return (self.win_start <= obj.win_end and
                 self.win_end >= obj.win_start and
                 obj.allString == self.allString)
