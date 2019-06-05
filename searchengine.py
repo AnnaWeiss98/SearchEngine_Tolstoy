@@ -81,7 +81,11 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-    def find_window(self, findstr, window_len = 3):
+    def find_window(self, findstr, window_len=3):
+        """
+        Search database and return files
+        and positions for the searched word
+        """
 
         if not isinstance(findstr, str):
             raise ValueError
@@ -92,11 +96,11 @@ class SearchEngine(object):
         tokenizer = Tokenizer()
         result_dict = self.multiple_search(findstr)
 
-        for file_key in result_dict.keys():
+        for file_key in result_dict:
             wins = []
             result_list = result_dict[file_key]
 
-            for result_token in result_list:
+            for result_position in result_list:
 
                 with open(file_key) as f:
                     for i, line in enumerate(f):
@@ -131,7 +135,7 @@ class SearchEngine(object):
 
         return self.join_windows(windows) #call the crossing method
 
-    def join_windows(self, _dict): #this method cross the windows
+    def join_windows(self, in_dict): #this method cross the windows
 
         window_dict = {}
 
