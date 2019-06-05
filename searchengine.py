@@ -1,188 +1,208 @@
-from tokenisation import Tokenizer
-import shelve
-import os
-import re
+"""
+tokenizer
+this module performs tokenisation of a text and extracts tokens
+"""
+import unicodedata  # this is a module
 
 
-class TokenWindow(object):
-    def __init__(self, allString, pos, start, end):
-        self.allString = allString  # all the line
-        self.positions = pos  # list of Positions
-        self.win_start = start  # start window
-        self.win_end = end  # end window
+class Token(object):  # example, part of token's klass
+
+    """
+    Class of tokens taken from a given text
+    """
+
+    def __init__(self, position, s):  # constructor, self-object,others atr
+        """
+        Constructor for token.
+        @param position: position is an index of the first element of token
+        @param s: s is a presentation of token's string
+        @return: token
+        """
+        self.position = position  # token's position in the text
+        self.s = s  # write the meaning of variable
 
     def __repr__(self):
-        s = '{}, {}, {}, {}'.format(self.allString, str(self.positions), self.win_start, self.win_end)
+        """
+        a function that asign numbers to tokens
+        """
+        return self.s + '_' + str(self.position)
 
-        return s
+
+class Token_1(Token):  # example, part of token's klass
+    """
+    Class of tokens taken from a given text
+    """
+
+    def __init__(self, position, s, t):  # constructor, self-object,others atr
+        """
+        Constructor for token.
+        @param position: position is an index of the first element of token
+        @param s: s is a presentation of token's string
+        @return: token
+        """
+        self.position = position  # token's position in the text
+        self.s = s  # write the meaning of variable
+        self.t = t  # type
+
+    def __repr__(self):
+        """
+        a function that asign numbers to tokens
+        this function returns token and its type
+        """
+
+        return self.s + '_' + str(self.t) + "_" + str(self.position)
 
     def __eq__(self, obj):
         '''
         check if two tokens are equal (it is so when they have the
         same first and last symbol
         '''
-        return self.positions == obj.positions and self.win_start == obj.win_start and self.win_end == obj.win_end
-
-    def window_is_junction(self, obj):  #checking whether windows are intersected
-        return (self.win_start <= obj.win_end and
-                self.win_end >= obj.win_start and
-                obj.allString == self.allString)
+        return self.s == obj.s and self.position == obj.position
 
 
-class SearchEngine(object):
+class Tokenizer(object):
     """
-    Class containing methods for working with database.
+    Class that makes a list of tokens
     """
 
-    def __init__(self, database):
+    def tokenize(self, strim):
         """
-        Create an instance of SearchEngine class.
+        A function that returns tokens with alphabetic symbols
+        @param: strim of text
+        @return: a list of tokens
         """
-        self.database = shelve.open(database)
-
-    def __del__(self):
-        self.database.close()
-
-    def search(self, query):
+        if not isinstance(strim, str):
+            raise ValueError('Input has an unappropriate type,it should be str')
+        tokensback = []  # clean list
+        if not strim:
+            return tokensback
+        position = 0
+        if strim[0].isalpha():
+            inToken = True
+        else:
+            inToken = False
+        for i, c in enumerate(strim):
+            if c.isalpha() and not strim[i - 1].isalpha():
+                position = i
+                inToken = True
+            if not c.isalpha() and strim[i - 1].isalpha() and inToken:
+                s = strim[position:i]
+                t = Token(position, s)
+                tokensback.append(t)  # writing token to list
+                inToken = False
         """
-        Search database and return files
-        and positions for the searched word
+        condition for alphabetic symbol standing without nonalphabetic symbol after it
+        it is important for the end of text
         """
-        if not isinstance(query, str):
-            raise ValueError
-        return self.database.get(query, {})
+        if c.isalpha():
+            s = strim[position:i + 1]
+            t = Token(position, s)
+            tokensback.append(t)
+        return tokensback
+        if c.isalpha():
+            s = strim[position:i - 1]
+            t = Token(position, s)
+            tokensback.append(t)
+        return tokensback
 
-    def multiple_search(self, query):
-        if not isinstance(query, str):
-            raise ValueError
-        if not query:
-            return {}
+    def tokenize_generator(self, strim):
+        """
+        A function that returns tokens with alphabetic symbols
+        @param: strim of text
+        @return: a list of tokens
+        """
+        if not isinstance(strim, str):
+            raise ValueError('Input has an unappropriate type,it should be str')
+        position = 0
+        if strim[0].isalpha():
+            inToken = True
+        else:
+            inToken = False
+        for i, c in enumerate(strim):
+            if c.isalpha() and not strim[i - 1].isalpha():
+                position = i
+                inToken = True
+            if not c.isalpha() and strim[i - 1].isalpha() and inToken:
+                s = strim[position:i]
+                t = Token(position, s)
+                yield t  # writing token
+                inToken = False
+        """
+        condition for alphabetic symbol standing without nonalphabetic symbol after it
+        it is important for the end of text
+        """
+        if c.isalpha():
+            s = strim[position:i + 1]
+            t = Token(position, s)
+            yield t
+        if c.isalpha():
+            s = strim[position:i - 1]
+            t = Token(position, s)
+            yield t
 
-        tokenizer = Tokenizer()
-        # tokenisation of query, create list of tokens
-        searchlist = []
-        for token in tokenizer.tokenize_generator_type(query):
+    @staticmethod
+    def get_type(c):
+        """
+        this function defines the type
+        """
+
+        p = 'P'
+
+        if c.isalpha():
+            p = 'A'
+        if c.isdigit():
+            p = 'D'
+        if c.isspace():
+            p = 'S'
+            # we are looking for spaces
+            # (punctuation)
+        # if unicodedata.category(c)[0] == 'P':
+        #    p = 'P'
+
+        return p
+
+    def tokenize_generator_type(self, strim):
+        """
+        A function that returns tokens with alphabetic symbols
+        @param: strim of text
+        @return: a list of tokens
+        """
+        if not isinstance(strim, str):
+            raise ValueError('Input must be str !')
+        position = 0
+        last_type = ""
+        for i, c in enumerate(strim):
+            this_type = self.get_type(c)
+            if this_type != last_type and i > 0:
+                s = strim[position:i]  # representation of string
+                t = Token_1(position, s, last_type)
+                yield t
+                position = i
+            last_type = this_type
+        """
+        condition for alphabetic symbol standing without nonalphabetic symbol after it
+        it is important for the end of text
+        """
+        s = strim[position:i + 1]
+        t = Token_1(position, s, this_type)
+        yield t
+
+    def generate_type_AD(self, text):
+        """
+        Generator.
+        Divides a string into TypeToken instances. Returns only those with type
+        'a' or 'd'.
+        """
+        for token in self.tokenize_generator_type(text):
             if token.t == 'A' or token.t == 'D':
-                searchlist.append(token.s)
-        # search each token from query
-        results_of_search = []
-        for token in searchlist:
-            results_of_search.append(set(self.search(token)))
-        # find files with all words from query
-        list_of_files = results_of_search[0]
-        for f in results_of_search:
-            list_of_files = list_of_files & f
-        # create a dictionary of positions of all query tokens in files
-        final_dict = {}
-        for f in list_of_files:
-            final_dict[f] = []
-            for token in searchlist:
-                final_dict[f].extend(self.database[token][f])
-            final_dict[f].sort()
-        return final_dict
+                yield token
 
-    def find_window(self, findstr, window_len=3):
-        """
-        Search database and return files
-        and positions for the searched word
-        """
 
-        if not isinstance(findstr, str):
-            raise ValueError
-        if not findstr:
-            return {}
+def main():
+    x = Tokenizer()
+    for i in x.tokenize_generator_type(' h50 ht ? 20 h d sun'):
+        print(i)
 
-        windows = {}
-        tokenizer = Tokenizer()
-        result_dict = self.multiple_search(findstr)
 
-        for file_key in result_dict:
-            wins = []
-            result_list = result_dict[file_key]
-
-            for result_position in result_list:
-
-                with open(file_key) as f:
-                    for i, line in enumerate(f):
-                        if i == result_token.string:
-                            break
-                line = line.strip("\n")
-
-                right_context = line[result_token.start:]
-                left_context = line[:result_token.end][::-1]
-
-                i = 0
-                for token in tokenizer.tokenize_generator_type(left_context):
-                    if token.t in ['A', 'D']:
-                        i += 1
-                    if i == window_len + 1:
-                        break
-
-                start = result_token.end - token.position - len(token.s)
-
-                i = 0
-                for token in tokenizer.tokenize_generator_type(right_context):
-                    if token.t in ['A', 'D']:
-                        i += 1
-                    if i == window_len + 1:
-                        break
-
-                end = result_token.start + token.position + len(token.s)
-                wins.append(TokenWindow(line, [result_token], start, end))
-
-            if len(wins) > 0:
-                windows[file_key] = wins
-
-        return self.join_windows(windows) #call the crossing method
-
-    def join_windows(self, in_dict): #this method cross the windows
-
-        window_dict = {}
-
-        for f, wins in _dict.items():
-            pr_win = None
-            for win in wins:
-                if pr_win is not None and pr_win.window_is_junction(win):
-                    for pos in win.positions:
-                        if pos not in pr_win.positions:
-                            pr_win.positions.append(pos)
-                            """
-                            he looks at whether the pr_win variable is defined,
-                            if yes, then checks whether the windows intersect,
-                            if yes then intersects. otherwise, it looks again
-                            whether the pr_win variable is defined; if so, it
-                            adds it to the window array. pr_win equates to the
-                            current window
-                            """
-
-                    pr_win.win_start = min(pr_win.win_start, win.win_start)
-                    pr_win.win_end = max(pr_win.win_end, win.win_end)
-                else:
-                    if pr_win is not None:
-                        window_dict.setdefault(f, []).append(pr_win)
-                    pr_win = win
-            window_dict.setdefault(f, []).append(pr_win)
-
-        return window_dict
-
-    def find_supplemented_window(self, findstr, window_len):
-
-        window_dict = self.find_window(findstr, window_len)
-        re_right = re.compile(r'[.!?] [A-ZА-Я]')
-        re_left = re.compile(r'[A-ZА-Я] [.!?]')
-
-        for f, wins in window_dict.items():
-            for win in wins:
-                r = win.allString[win.win_end:]
-                l = win.allString[:win.win_start + 1][::-1]
-                if l:
-                    try:
-                        win.win_start = win.win_start - re_left.search(l).start()
-                    except:
-                        win.win_start = 0
-                if r:
-                    try:
-                        win.win_end += re_right.search(r).start() + 1
-                    except:
-                        win.win_end = len(win.allString)
-        return window_dict
+if __name__ == "__main__":
+    main()
