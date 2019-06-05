@@ -2,15 +2,16 @@
 tokenizer
 this module performs tokenisation of a text and extracts tokens
 """
-import unicodedata #this is a module
+import unicodedata  # this is a module
 
 
 class Token(object):  # example, part of token's klass
-   
+
     """
     Class of tokens taken from a given text
     """
-    def __init__(self,position,s):  # constructor, self-object,others atr
+
+    def __init__(self, position, s):  # constructor, self-object,others atr
         """
         Constructor for token.
         @param position: position is an index of the first element of token
@@ -19,25 +20,20 @@ class Token(object):  # example, part of token's klass
         """
         self.position = position  # token's position in the text
         self.s = s  # write the meaning of variable
-        
+
     def __repr__(self):
         """
         a function that asign numbers to tokens
         """
-        return self.s+'_'+str(self.position)
+        return self.s + '_' + str(self.position)
 
 
-class Token_1 (Token):  # example, part of token's klass
+class Token_1(Token):  # example, part of token's klass
     """
     Class of tokens taken from a given text
     """
-    def __eq__(self, obj):
-        '''
-        check if two tokens are equal (it is so when they have the
-        same first and last symbol
-        '''
-        return self.s==obj.s and self.position==obj.position
-    def __init__(self,position,s,t):  # constructor, self-object,others atr
+
+    def __init__(self, position, s, t):  # constructor, self-object,others atr
         """
         Constructor for token.
         @param position: position is an index of the first element of token
@@ -46,44 +42,52 @@ class Token_1 (Token):  # example, part of token's klass
         """
         self.position = position  # token's position in the text
         self.s = s  # write the meaning of variable
-        self.t = t # type
+        self.t = t  # type
+
     def __repr__(self):
         """
         a function that asign numbers to tokens
         this function returns token and its type
         """
-        
-        return self.s+'_'+str(self.t)
-    
-   
+
+        return self.s + '_' + str(self.t) + "_" + str(self.position)
+
+    def __eq__(self, obj):
+        '''
+        check if two tokens are equal (it is so when they have the
+        same first and last symbol
+        '''
+        return self.s == obj.s and self.position == obj.position
+
+
 class Tokenizer(object):
-    
     """
     Class that makes a list of tokens
     """
-    def tokenize(self,strim):
+
+    def tokenize(self, strim):
         """
         A function that returns tokens with alphabetic symbols
         @param: strim of text
         @return: a list of tokens
         """
-        if not isinstance(strim,str):
+        if not isinstance(strim, str):
             raise ValueError('Input has an unappropriate type,it should be str')
         tokensback = []  # clean list
-        if not strim: 
+        if not strim:
             return tokensback
         position = 0
         if strim[0].isalpha():
             inToken = True
         else:
             inToken = False
-        for i,c in enumerate(strim):
-            if c.isalpha()and not strim[i-1].isalpha():
-                position=i
+        for i, c in enumerate(strim):
+            if c.isalpha() and not strim[i - 1].isalpha():
+                position = i
                 inToken = True
-            if not c.isalpha()and strim[i-1].isalpha() and inToken:
-                s = strim[position:i]  # срез
-                t = Token(position,s)  
+            if not c.isalpha() and strim[i - 1].isalpha() and inToken:
+                s = strim[position:i]
+                t = Token(position, s)
                 tokensback.append(t)  # writing token to list
                 inToken = False
         """
@@ -91,99 +95,114 @@ class Tokenizer(object):
         it is important for the end of text
         """
         if c.isalpha():
-            s = strim[position:i+1]     
-            t = Token(position,s)
+            s = strim[position:i + 1]
+            t = Token(position, s)
             tokensback.append(t)
         return tokensback
         if c.isalpha():
-            s = strim[position:i-1]     
-            t = Token(position,s)
+            s = strim[position:i - 1]
+            t = Token(position, s)
             tokensback.append(t)
         return tokensback
 
-    def tokenize_generator(self,strim):
+    def tokenize_generator(self, strim):
         """
         A function that returns tokens with alphabetic symbols
         @param: strim of text
         @return: a list of tokens
         """
-        if not isinstance(strim,str):
+        if not isinstance(strim, str):
             raise ValueError('Input has an unappropriate type,it should be str')
-        position=0
+        position = 0
         if strim[0].isalpha():
             inToken = True
         else:
             inToken = False
-        for i,c in enumerate(strim):
-            if c.isalpha()and not strim[i-1].isalpha():
+        for i, c in enumerate(strim):
+            if c.isalpha() and not strim[i - 1].isalpha():
                 position = i
-                inToken=True
-            if not c.isalpha()and strim[i-1].isalpha() and inToken:
-                s = strim[position:i]  # срез
-                t = Token(position,s)  
-                yield t  # writing token 
+                inToken = True
+            if not c.isalpha() and strim[i - 1].isalpha() and inToken:
+                s = strim[position:i]
+                t = Token(position, s)
+                yield t  # writing token
                 inToken = False
         """
         condition for alphabetic symbol standing without nonalphabetic symbol after it
         it is important for the end of text
         """
         if c.isalpha():
-            s = strim[position:i+1]     
-            t = Token(position,s)
+            s = strim[position:i + 1]
+            t = Token(position, s)
             yield t
         if c.isalpha():
-            s = strim[position:i-1]     
-            t = Token(position,s)
+            s = strim[position:i - 1]
+            t = Token(position, s)
             yield t
-            
+
     @staticmethod
     def get_type(c):
-       """
-       this function defines the type
-       """
-       if c.isalpha():
-           p = 'A'
-       if c.isdigit():
-           p = 'D'
-       if c.isspace():
-           p = 'S'
-           # we are looking for spaces
-           #(punctuation)
-       if unicodedata.category(c)[0]=='P':
-           p = 'P'
-       return p
-    
-    def tokenize_generator_type(self,strim):
+        """
+        this function defines the type
+        """
+
+        p = 'P'
+
+        if c.isalpha():
+            p = 'A'
+        if c.isdigit():
+            p = 'D'
+        if c.isspace():
+            p = 'S'
+            # we are looking for spaces
+            # (punctuation)
+        # if unicodedata.category(c)[0] == 'P':
+        #    p = 'P'
+
+        return p
+
+    def tokenize_generator_type(self, strim):
         """
         A function that returns tokens with alphabetic symbols
         @param: strim of text
         @return: a list of tokens
         """
-        if not isinstance(strim,str):
+        if not isinstance(strim, str):
             raise ValueError('Input must be str !')
         position = 0
         last_type = ""
-        for i,c in enumerate(strim):
-            this_type = self.get_type(c) 
-            if this_type != last_type and i>0:
+        for i, c in enumerate(strim):
+            this_type = self.get_type(c)
+            if this_type != last_type and i > 0:
                 s = strim[position:i]  # representation of string
-                t = Token_1(position,s,last_type)  
+                t = Token_1(position, s, last_type)
                 yield t
-                position=i
-            last_type=this_type
+                position = i
+            last_type = this_type
         """
         condition for alphabetic symbol standing without nonalphabetic symbol after it
         it is important for the end of text
         """
-        s = strim[position:i+1]
-        t = Token_1(position,s,this_type)
+        s = strim[position:i + 1]
+        t = Token_1(position, s, this_type)
         yield t
 
-        
+    def generate_type_AD(self, text):
+        """
+        Generator.
+        Divides a string into TypeToken instances. Returns only those with type
+        'a' or 'd'.
+        """
+        for token in self.tokenize_generator_type(text):
+            if token.t == 'A' or token.t == 'D':
+                yield token
+
+
 def main():
     x = Tokenizer()
     for i in x.tokenize_generator_type(' h50 ht ? 20 h d sun'):
         print(i)
+
 
 if __name__ == "__main__":
     main()
