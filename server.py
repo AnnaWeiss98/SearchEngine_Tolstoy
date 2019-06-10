@@ -1,6 +1,9 @@
-#!/usr/bin/env python
-from http.server import HTTPServer,BaseHTTPRequestHandler 
+from http.server import HTTPServer,BaseHTTPRequestHandler
+from urllib.parse import parse_qs
+from cgi import parse_header, parse_multipart
+from searchengine import SearchEngine
 
+#from tokenwindow import Windows
 
 body = '''
 <!DOCTYPE html>
@@ -10,7 +13,7 @@ body = '''
         <title>Поиск</title>
     </head>
     <body>
-     <form method='POST'> #tells that we send a request into server by method POST
+     <form method='POST'>
      Искомое слово: <input type="text" name="findstr">
     <input type="submit" value="Найти">
     <p>
@@ -25,22 +28,54 @@ body = '''
 class web_server(BaseHTTPRequestHandler):
 
     def do_GET(self):
+        """
+        Creates a simple HTML page with a field and a button.
+        """
 
-        self.send_response(200) #responce that all ok, 200 - successful request
+        self.send_response(200)
         self.end_headers()
         result = ''
         self.wfile.write(bytes(body.format(result),'cp1251'))
 
-    def do_POST(self): #preform for realisation method POST
-        self.do_GET()
+
+    def do_POST(self):
+        """
+        Seends search results in response to the search query.
+        """
+
+        global search_engine
+
+        postvars = {}
+        ctype, pdict = parse_header(self.headers['content-type'])
+
+        if ctype == 'multipart/form-data':
+            postvars = parse_multipart(self.rfile, pdict)
+
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers['content-length'])
+            str_ =  self.rfile.read(length).decode()
+            postvars = parse_qs(str_, keep_blank_values=1, strict_parsing=False, encoding='cp1251')
+
+        self.send_response(200)
+        self.end_headers()
+
+        findstr = postvars['findstr'][0]
+        result = ''
+
+        res = search_engine.find_supplemented_window(findstr, 2)
+        for k in res:
+            result += k
+            result += '<ul>'
+            for v in res[k]:
+                result += '<li>'+v.get_BB_string()+'</li>'
+
+            result +='</ul>'
+        self.wfile.write(bytes(body.format(result),'cp1251'))
 
 
-if __name__== '__main__': 
-    '''it's for pythons working by itself, if we use the programm like plug-ins (added modul), 
-    this part doesn't work'''
+if __name__== '__main__':
 
+    search_engine = SearchEngine('database')
     print ('Start server.')
-    httpd = HTTPServer(('localhost', 80), web_server) #the creation of server itself with adress localhost and port 80(standart)
-    ''' web_server inherits from klass BaseHTTPRequestHandler, hear we redefine two methods do_POST and do_GET, we 
-    can work with requests by ourself'''
-    httpd.serve_forever() #this method lets the server working by helps of brauser
+    httpd = HTTPServer(('localhost', 80), web_server)
+    httpd.serve_forever()
