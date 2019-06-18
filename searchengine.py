@@ -6,9 +6,6 @@ import re
 
 class TokenWindow(object):
     def __init__(self, allString, pos, start, end):
-        """
-        Creates an instance of class TokenWindow given the values of its attributes
-        """
         self.allString = allString  # all the line
         self.positions = pos  # list of Positions
         self.win_start = start  # start window
@@ -27,9 +24,6 @@ class TokenWindow(object):
         return self.positions == obj.positions and self.win_start == obj.win_start and self.win_end == obj.win_end
 
     def window_is_junction(self, obj):
-        """
-        This method joins windows.
-        """
         return (self.win_start <= obj.win_end and
                 self.win_end >= obj.win_start and
                 obj.allString == self.allString)
@@ -126,24 +120,24 @@ class SearchEngine(object):
 
                 with open(file_key) as f:
                     for i, line in enumerate(f):
-                        if i == result_token.string:
+                        if i == result_position.string:
                             break
                 line = line.strip("\n")
 
-                right_context = line[result_token.start:]
-                left_context = line[:result_token.end][::-1]
+                right_context = line[result_position.start:]
+                left_context = line[:result_position.end][::-1]
 
                 for i, token in enumerate(tokenizer.generate_type_AD(left_context)):
                     if i == window_len:
                         break
-                start = result_token.end - token.position - len(token.s)
+                start = result_position.end - token.position - len(token.s)
 
                 for i, token in enumerate(tokenizer.generate_type_AD(right_context)):
                     if i == window_len:
                         break
-                end = result_token.start + token.position + len(token.s)
+                end = result_position.start + token.position + len(token.s)
 
-                wins.append(TokenWindow(line, [result_token], start, end))
+                wins.append(TokenWindow(line, [result_position], start, end))
 
             if len(wins) > 0:
                 windows[file_key] = wins
@@ -154,7 +148,7 @@ class SearchEngine(object):
 
         window_dict = {}
 
-        for f, wins in _dict.items():
+        for f, wins in in_dict.items():
             pr_win = None
             for win in wins:
                 if pr_win is not None and pr_win.window_is_junction(win):
