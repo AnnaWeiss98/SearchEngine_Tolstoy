@@ -13,7 +13,7 @@ body = '''
         <title>Поиск</title>
     </head>
     <body>
-     <form method='POST'>
+     <form method="POST">
      Искомое слово: <input type="text" name="findstr">
     <input type="submit" value="Найти">
     <p>
