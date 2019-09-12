@@ -25,9 +25,11 @@ body = '''
 </html>
 '''
 
+class custom_handler(BaseHTTPRequestHandler):
+    #search_engine = None
 
-class web_server(BaseHTTPRequestHandler):
-    search_engine = None
+        #self.search_engine = SearchEngine('database')
+
     def do_GET(self):
         """
         Creates a simple HTML page with a field and a button.
@@ -65,14 +67,14 @@ class web_server(BaseHTTPRequestHandler):
     def gen_page(self, findstr, limit, offset):
 
         result = ''
-        res = search_engine.find_supplemented_window(findstr, 2)
+        res = self.server.search_engine.find_supplemented_window(findstr, 2)
         count = 0
 
         for k in res:
             filename = k
             filename += '<ul>'
             for v in res[k]:
-                if count >= offset and count < offset + limit:
+                if count >= offset and count <= offset + limit - 1:
                     if filename != '':
                         if result != '':
                             result += '</ul>'
@@ -91,8 +93,8 @@ class web_server(BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    search_engine = SearchEngine('database')
+
+    httpd = HTTPServer(('localhost', 80), custom_handler)
+    httpd.search_engine = SearchEngine('database')
     print ('Start server.')
-    httpd = HTTPServer(('localhost', 80), web_server)
-    web_server.search_engine = search_engine
     httpd.serve_forever()
