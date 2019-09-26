@@ -102,7 +102,7 @@ class custom_handler(BaseHTTPRequestHandler):
                         result += filename
                         filename = ''
                     result += '<li>' + v.get_BB_string() + '</li>'
-                elif count > offset + limit - 1:
+                elif count >= offset + limit:
                     break
 
                 count += 1
