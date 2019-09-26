@@ -12,33 +12,48 @@ body = '''
     </head>
     <body>
      <form method='POST'>
-     Начальная запись: <input type="text" name="offset" value="0" size="4"><br>
-     Число результатов на странице: <input type="text" name="limit" value="1" size="4"><br>
-     Искомое слово: <input type="text" name="findstr">
-    <input type="submit" value="Найти">
-    <p>
-    <br>
+     <table>
+     {}
+     <tr>
+     <td>Искомое слово:</td>
+     <td><input type="text" name="findstr"></td>
+     <td><input type="submit" value="Найти"></td>
+     </tr>
+     </table>
     {}
-    </p>
-</form>
+    </form>
     </body>
 </html>
 '''
 
-class custom_handler(BaseHTTPRequestHandler):
-    #search_engine = None
+form_limit ='''
+     <tr>
+     <td colspan="2" align="center"> Для файла {} </td>
+     </tr>
+     <tr>
+     <td>Начальная запись:</td>
+     <td><input type="text" name="doc{}offset" value="{}" size="4"></td>
+     </tr>
+     <tr>
+     <td>Число результатов на странице:</td>
+     <td><input type="text" name="doc{}limit" value="{}" size="4"></td>
+     </tr>
+'''
 
-        #self.search_engine = SearchEngine('database')
+class custom_handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """
         Creates a simple HTML page with a field and a button.
         """
-
         self.send_response(200)
         self.end_headers()
         result = ''
-        self.wfile.write(bytes(body.format(result), 'cp1251'))
+        limit_str =''
+        for l in range (0,self.server.countKeys):
+            limit_str += form_limit.format(str(l), str(l), "0", str(l), "10")
+
+        self.wfile.write(bytes(body.format(limit_str, result), 'cp1251'))
 
     def do_POST(self):
         """
@@ -58,23 +73,29 @@ class custom_handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
-        findstr = postvars['findstr'][0]
-        limit = int(postvars['limit'][0])
-        offset = int(postvars['offset'][0])
-        result = self.gen_page(findstr, limit, offset)
-        self.wfile.write(bytes(body.format(result), 'cp1251'))
+        limit_str, result = self.gen_page(postvars)
+        self.wfile.write(bytes(body.format(limit_str, result), 'cp1251'))
 
-    def gen_page(self, findstr, limit, offset):
+    def gen_page(self, postvars):
 
         result = ''
-        res = self.server.search_engine.find_supplemented_window(findstr, 2)
-        count = 0
+        limit_str =''
 
-        for k in res:
+        findstr = postvars['findstr'][0]
+        res = self.server.search_engine.find_supplemented_window(findstr, 2)
+        
+        """
+        i - step number in cycle for dynamic formation of the input field
+        """
+        for i,k in enumerate(res.keys()):
             filename = k
-            filename += '<ul>'
+            filename += '<ul>'    
+            count = 0
+            limit = int(postvars['doc'+str(i)+'limit'][0])
+            offset = int(postvars['doc'+str(i)+'offset'][0])
+            limit_str += form_limit.format(str(i), str(i), str(offset), str(i), str(limit))
             for v in res[k]:
-                if count >= offset and count <= offset + limit - 1:
+                if offset <= count < offset + limit:
                     if filename != '':
                         if result != '':
                             result += '</ul>'
@@ -86,15 +107,13 @@ class custom_handler(BaseHTTPRequestHandler):
 
                 count += 1
 
-            if count > offset + limit - 1:
-                break
-
-        return result
+        return limit_str, result
 
 
 if __name__ == '__main__':
 
     httpd = HTTPServer(('localhost', 80), custom_handler)
     httpd.search_engine = SearchEngine('database')
+    httpd.countKeys =  len(httpd.search_engine.database.get('Толстой')) #countKeys - a number of files in db
     print ('Start server.')
     httpd.serve_forever()
