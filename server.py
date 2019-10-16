@@ -6,39 +6,46 @@ from searchengine import SearchEngine
 body = '''
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=cp1251" />
+    <head>        <meta http-equiv="Content-Type" content="text/html; charset=cp1251" />
         <title>Поиск</title>
     </head>
     <body>
      <form method='POST'>
      <table>
-     {}
      <tr>
-     <td>Искомое слово:</td>
-     <td><input type="text" name="findstr"></td>
-     <td><input type="submit" value="Найти"></td>
+     <td>Searchword:</td>
+     <td><input type="text" name="findstr" value={}></td>
+     <td><input type="submit" value="Search"></td>
+     <tr>
+     <td>First tom:</td>
+     <td><input type="text" name="offset" value="{}" size="4"></td>
+     </tr>
+     <tr>
+     <td>Last tom:</td>
+     <td><input type="text" name="limit" value="{}" size="4"></td>
      </tr>
      </table>
-    {}
+     {}
     </form>
     </body>
 </html>
 '''
 
 form_limit ='''
+     <table>
      <tr>
      <td colspan="2" align="center"> Для файла {} </td>
      </tr>
      <tr>
-     <td>Начальная запись:</td>
+     <td>first record:</td>
      <td><input type="text" name="doc{}offset" value="{}" size="4"></td>
      </tr>
      <tr>
-     <td>Число результатов на странице:</td>
+     <td>a number of results on the page:</td>
      <td><input type="text" name="doc{}limit" value="{}" size="4"></td>
-     </tr>
-'''
+     </table>
+     {}
+ '''
 
 class custom_handler(BaseHTTPRequestHandler):
 
@@ -49,11 +56,7 @@ class custom_handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         result = ''
-        limit_str =''
-        for l in range (0,self.server.countKeys):
-            limit_str += form_limit.format(str(l), str(l), "0", str(l), "10")
-
-        self.wfile.write(bytes(body.format(limit_str, result), 'cp1251'))
+        self.wfile.write(bytes(body.format('','0','4',result), 'cp1251'))
 
     def do_POST(self):
         """
@@ -73,47 +76,62 @@ class custom_handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
-        limit_str, result = self.gen_page(postvars)
-        self.wfile.write(bytes(body.format(limit_str, result), 'cp1251'))
+        result = self.gen_page(postvars)
+        offset = self.get_int(postvars['offset'][0],0)
+        limit =  self.get_int(postvars['limit'][0],4)
+        self.wfile.write(bytes(body.format(postvars['findstr'][0],str(offset),str(limit),result), 'cp1251'))
+
+    def get_int(self,value, def_value):
+        result = def_value
+        try:
+            result = int(value)
+        except ValueError:
+            pass
+        return result
+
 
     def gen_page(self, postvars):
-
         result = ''
-        limit_str =''
-
         findstr = postvars['findstr'][0]
-        res = self.server.search_engine.find_supplemented_window(findstr, 2)
+        limit = self.get_int(postvars['limit'][0], 4)
+        offset = self.get_int(postvars['offset'][0], 0)
+
+        o = []
+        l = []
+        for ind in range(offset, limit):
+            if 'doc'+str(ind)+'offset' in postvars:  
+                o.append(self.get_int(postvars['doc'+str(ind)+'offset'][0],0))
+                l.append(self.get_int(postvars['doc' + str(ind) + 'limit'][0],5))
+            else:
+                o.append(0)
+                l.append(5)
+
+        limits = list(zip(o,l))
+
+        res = self.server.search_engine.find_supplemented_window(findstr, 2, offset, limit, limits)
+
         
-        """
-        i - step number in cycle for dynamic formation of the input field
-        """
         for i,k in enumerate(res.keys()):
-            filename = k
-            filename += '<ul>'    
-            count = 0
-            limit = int(postvars['doc'+str(i)+'limit'][0])
-            offset = int(postvars['doc'+str(i)+'offset'][0])
-            limit_str += form_limit.format(str(i), str(i), str(offset), str(i), str(limit))
+            limit = 5
+            offset = 0
+            if 'doc'+str(i+offset)+'limit' in postvars:
+                 limit = self.get_int(postvars['doc'+str(i+offset)+'limit'][0],5)
+                 offset = self.get_int(postvars['doc'+str(i+offset)+'offset'][0],0)
+
+            re = '<ul>'
             for v in res[k]:
-                if offset <= count < offset + limit:
-                    if filename != '':
-                        if result != '':
-                            result += '</ul>'
-                        result += filename
-                        filename = ''
-                    result += '<li>' + v.get_BB_string() + '</li>'
-                elif count >= offset + limit:
-                    break
+                re += '<li>' + v.get_BB_string() + '</li>'
+            re += '</ul>'
 
-                count += 1
+            result += form_limit.format(k, str(i), str(offset), str(i), str(limit),re)
 
-        return limit_str, result
+
+        return result
 
 
 if __name__ == '__main__':
 
     httpd = HTTPServer(('localhost', 80), custom_handler)
     httpd.search_engine = SearchEngine('database')
-    httpd.countKeys =  len(httpd.search_engine.database.get('Толстой')) #countKeys - a number of files in db
     print ('Start server.')
     httpd.serve_forever()
