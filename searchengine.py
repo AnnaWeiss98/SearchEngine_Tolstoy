@@ -97,7 +97,7 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-    def find_window(self, findstr, window_len=3):
+    def find_window(self, findstr, window_len=3,offset=0,limit=0,winLimits=None):
         """
         Search database and return files
         and positions for the searched word
@@ -112,9 +112,25 @@ class SearchEngine(object):
         tokenizer = Tokenizer()
         result_dict = self.multiple_search(findstr)
 
-        for file_key in result_dict:
+        for f, file_key in enumerate (result_dict.keys()):
             wins = []
+            if f >= limit:
+               break
+
+            if f < offset:
+                continue
+
             result_list = result_dict[file_key]
+       
+            if winLimits is not None:
+                  st = int(winLimits[f-offset][0])
+                  en = int(winLimits[f-offset][1])
+
+                  if len(result_list) < en:
+                      en = len(result_list)
+                
+                  
+                  result_list = result_list[st:en]
 
             for result_position in result_list:
 
@@ -142,7 +158,7 @@ class SearchEngine(object):
             if len(wins) > 0:
                 windows[file_key] = wins
 
-        return self.join_windows(windows)
+        return self.join_windows(windows)    
 
     def join_windows(self, in_dict):
 
@@ -174,9 +190,10 @@ class SearchEngine(object):
 
         return window_dict
 
-    def find_supplemented_window(self, findstr, window_len):
+    def find_supplemented_window(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
-        window_dict = self.find_window(findstr, window_len)
+        window_dict = self.find_window(findstr, window_len, offset, limit, winLimits)
+            
         re_right = re.compile(r'[.!?] [A-ZА-Я]')
         re_left = re.compile(r'[A-ZА-Я] [.!?]')
 
