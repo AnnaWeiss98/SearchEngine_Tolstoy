@@ -120,8 +120,7 @@ class custom_handler(BaseHTTPRequestHandler):
 
             re = '<ul>'
             for v in res[k]:
-                if v is not None:
-                     re += '<li>' + v.get_BB_string() + '</li>'
+                re += '<li>' + v.get_BB_string() + '</li>'
             re += '</ul>'
 
             result += form_limit.format(k, str(i), str(offset), str(i), str(limit),re)
