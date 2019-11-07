@@ -155,8 +155,8 @@ class SearchEngine(object):
 
                 wins.append(TokenWindow(line, [result_position], start, end))
 
-            if len(wins) > 0:
-                windows[file_key] = wins
+            #if len(wins) > 0:
+            windows[file_key] = wins
 
         return self.join_windows(windows)    
 
@@ -199,6 +199,8 @@ class SearchEngine(object):
 
         for f, wins in window_dict.items():
             for win in wins:
+                if win is None:
+                   continue
                 r = win.allString[win.win_end:]
                 l = win.allString[:win.win_start + 1][::-1]
                 if l:
