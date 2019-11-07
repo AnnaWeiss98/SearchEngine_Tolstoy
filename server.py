@@ -21,7 +21,7 @@ body = '''
      <td><input type="text" name="offset" value="{}" size="4"></td>
      </tr>
      <tr>
-     <td>Last tom:</td>
+     <td>Count tom:</td>
      <td><input type="text" name="limit" value="{}" size="4"></td>
      </tr>
      </table>
@@ -98,7 +98,7 @@ class custom_handler(BaseHTTPRequestHandler):
 
         o = []
         l = []
-        for ind in range(offset, limit):
+        for ind in range(offset, offset+limit):
             if 'doc'+str(ind)+'offset' in postvars:  
                 o.append(self.get_int(postvars['doc'+str(ind)+'offset'][0],0))
                 l.append(self.get_int(postvars['doc' + str(ind) + 'limit'][0],5))
