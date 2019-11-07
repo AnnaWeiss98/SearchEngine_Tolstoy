@@ -72,7 +72,7 @@ class WindowsTest (unittest.TestCase):
             if i.startswith('test_db.'):
                 os.remove(i)
 
-    def test_wrong_input_error(self):  # instead of a line on input, user gives a list, so an error occurs
+    def test_wrong_input_error(self):
         with self.assertRaises(ValueError):
             files = ['test_window_one.txt']
             win = self.x.find_supplemented_window(files, 3,0,1,[(0,1)])
@@ -136,7 +136,7 @@ class WindowsTest (unittest.TestCase):
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
 
-    def test_get_window_two_result(self): # test returns two results
+    def test_get_window_two_result(self):
         result = self.x.find_supplemented_window('тестов', 1,0,1,[(0,2)])
         res1 = result['test_window_three.txt'][0]
         res2 = result['test_window_three.txt'][1]
@@ -151,7 +151,7 @@ class WindowsTest (unittest.TestCase):
         self.assertEqual(res2, win2)
         self.assertEqual(result, ideal)
 
-    def test_get_window_two_result2(self): # test returns only the first result
+    def test_get_window_two_result2(self):
         result = self.x.find_supplemented_window('тестов', 1,0,1,[(0,1)])
         res1 = result['test_window_three.txt'][0]
         win1 = TokenWindow(self.strr3.replace('\n',''), [Position(18, 24, 0)], 0, 25)
@@ -160,7 +160,7 @@ class WindowsTest (unittest.TestCase):
         self.assertEqual(res1, win1)
         self.assertEqual(result, ideal)
 
-    def test_get_window_two_result3(self): # test returns only the second result
+    def test_get_window_two_result3(self):
         result = self.x.find_supplemented_window('тестов', 1,0,1,[(1,2)])
         res1 = result['test_window_three.txt'][0]
         win1 = TokenWindow(self.strr4.replace('\n',''), [Position(18, 24, 1)], 0, 25)
@@ -172,9 +172,10 @@ class WindowsTest (unittest.TestCase):
 
     def test_get_window_wrong_offset(self):
         result = self.x.find_supplemented_window('tree', 2,0,1,[(2,1)])
-        res = result['test_window_one.txt'][0]
+        
+        res =result['test_window_one.txt']
         ideal = {'test_window_one.txt': []}
-        self.assertEqual(res, {})
+        self.assertEqual(res, [])
         self.assertEqual(result, ideal)
 
 
