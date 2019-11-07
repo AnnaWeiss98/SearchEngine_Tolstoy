@@ -110,7 +110,7 @@ class custom_handler(BaseHTTPRequestHandler):
 
         res = self.server.search_engine.find_supplemented_window(findstr, 2, offset, limit, limits)
 
-        
+        print (res.keys())
         for i,k in enumerate(res.keys()):
             limit = 5
             offset = 0
@@ -120,7 +120,8 @@ class custom_handler(BaseHTTPRequestHandler):
 
             re = '<ul>'
             for v in res[k]:
-                re += '<li>' + v.get_BB_string() + '</li>'
+                if v is not None:
+                     re += '<li>' + v.get_BB_string() + '</li>'
             re += '</ul>'
 
             result += form_limit.format(k, str(i), str(offset), str(i), str(limit),re)
