@@ -114,7 +114,7 @@ class SearchEngine(object):
 
         for f, file_key in enumerate (result_dict.keys()):
             wins = []
-            if f >= limit:
+            if f >= offset+limit:
                break
 
             if f < offset:
