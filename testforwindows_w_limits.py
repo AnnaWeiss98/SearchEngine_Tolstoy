@@ -172,7 +172,6 @@ class WindowsTest (unittest.TestCase):
 
     def test_get_window_wrong_offset(self):
         result = self.x.find_supplemented_window('tree', 2,0,1,[(2,1)])
-        
         res =result['test_window_one.txt']
         ideal = {'test_window_one.txt': []}
         self.assertEqual(res, [])
