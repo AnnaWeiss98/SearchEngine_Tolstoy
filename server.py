@@ -15,20 +15,22 @@ body = '''
      <table>
      <tr>
      <td>Searchword:</td>
-     <td><input type="text" name="findstr" value={}></td>
+     <td><input type="text" name="findstr" value={0}>
+         <input type="hidden" name="prev_findstr" value={0}>
+     </td>
      <td><input type="submit" value="Search"></td>
      <tr>
      <td><input type="submit" name="action" value="begin"></td>
      <td><input type="submit" name="action" value="back"></td>
      <td><input type="submit" name="action" value="forward"></td> 
-     <td><input type="hidden" name="offset" value="{}" size="4"></td>
+     <td><input type="hidden" name="offset" value="{1}" size="4"></td>
      </tr>
      <tr>
      <td>Count tom:</td>
-     <td><input type="text" name="limit" value="{}" size="4"></td>
+     <td><input type="text" name="limit" value="{2}" size="4"></td>
      </tr>
      </table>
-     {}
+     {3}
     </form>
     </body>
 </html>
@@ -89,7 +91,9 @@ class custom_handler(BaseHTTPRequestHandler):
         offset = self.get_int(postvars['offset'][0],0)
         if 'action' in postvars:
             offset = self.get_offset(postvars['action'][0],offset,limit)
-
+        
+        if postvars['findstr'][0] !=  postvars['prev_findstr'][0]:
+           offset = 0
         
         self.wfile.write(bytes(body.format(postvars['findstr'][0],str(offset),str(limit),result), 'cp1251'))
 
@@ -127,6 +131,9 @@ class custom_handler(BaseHTTPRequestHandler):
         if 'action' in postvars:
             offset = self.get_offset(postvars['action'][0],offset,limit)
 
+        if postvars['findstr'][0] !=  postvars['prev_findstr'][0]:
+           offset = 0
+
         o = []
         l = []
         for ind in range(offset, offset+limit):
@@ -136,6 +143,9 @@ class custom_handler(BaseHTTPRequestHandler):
                 offset_doc = self.get_int(postvars['doc'+str(ind)+'offset'][0],0)
                 if 'action'+str(ind) in postvars:                
                     offset_doc = self.get_offset(postvars['action'+str(ind)][0], offset_doc,limit_doc)
+
+                if postvars['findstr'][0] !=  postvars['prev_findstr'][0]:
+                      offset_doc = 0
 
                 o.append(offset_doc)
                 l.append(limit_doc)
@@ -160,6 +170,8 @@ class custom_handler(BaseHTTPRequestHandler):
                 if 'action'+str(i+offset) in postvars:                
                     offset_doc = self.get_offset(postvars['action'+str(i+offset)][0], offset_doc,limit_doc)
 
+                if postvars['findstr'][0] !=  postvars['prev_findstr'][0]:
+                      offset_doc = 0
             re = '<ul>'
             for v in res[k]:
                 re += '<li>' + v.get_BB_string() + '</li>'
