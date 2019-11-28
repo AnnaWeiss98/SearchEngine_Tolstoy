@@ -127,8 +127,7 @@ class SearchEngine(object):
         final_dict = {} 
         list_of_files= sorted(list_of_files)
         for i, f in enumerate(list_of_files):
-           
-            # key clipping
+
             if i >= offset + limit:
                 break
             if i < offset:
@@ -274,8 +273,8 @@ class SearchEngine(object):
             result_list = result_dict[file_key]
 
             if winLimits is not None:
-                st = int(winLimits[f][0])
-                en = st + int(winLimits[f][1])
+                st = int(winLimits[f][0])      # offset for current tom
+                en = st + int(winLimits[f][1]) # offset + limit for current tom
 
                 if st < 0:
                    st = 0
@@ -304,15 +303,18 @@ class SearchEngine(object):
                         break
                 end = result_position.start + token.position + len(token.s)
 
-                wins.append(TokenWindow(line, [result_position], start, end))
 
-                wins = self.join_windows({file_key: wins})[file_key]
+                win = TokenWindow(line, [result_position], start, end) # create new window 
+                win = self.supplemented_window(win)                    # expanding the window to the borders of the proposals 
+                wins.append(win)                                       # addind window to dictionary
+                wins = self.join_windows({file_key: wins})[file_key]   # connection of Windows
 
+                # stop when the required number of Windows is found
                 if len(wins) == en:
                     break
 
             if len(wins) > 0:
-                windows[file_key] = wins[st:]
+                windows[file_key] = wins[st:] #return the Windows from the required position (offset)
             else:
                 windows[file_key] = []
 
@@ -379,22 +381,24 @@ class SearchEngine(object):
 
         # Searcher window with limits
         window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
+        return  window_dict
+
+
+    def supplemented_window(self, win):
 
         re_right = re.compile(r'[.!?] [A-ZА-Я]')
         re_left = re.compile(r'[A-ZА-Я] [.!?]')
 
-        for f, wins in window_dict.items():
-            for win in wins:
-                r = win.allString[win.win_end:]
-                l = win.allString[:win.win_start + 1][::-1]
-                if l:
-                    try:
-                        win.win_start = win.win_start - re_left.search(l).start()
-                    except:
-                        win.win_start = 0
-                if r:
-                    try:
-                        win.win_end += re_right.search(r).start() + 1
-                    except:
-                        win.win_end = len(win.allString)
-        return window_dict
+        r = win.allString[win.win_end:]
+        l = win.allString[:win.win_start + 1][::-1]
+        if l:
+            try:
+               win.win_start = win.win_start - re_left.search(l).start()
+            except:
+               win.win_start = 0
+        if r:
+            try:
+                 win.win_end += re_right.search(r).start() + 1
+            except:
+                 win.win_end = len(win.allString)
+        return win
