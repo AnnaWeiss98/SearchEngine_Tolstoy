@@ -101,6 +101,9 @@ class SearchEngine(object):
 
         # with the limits for files
 
+        if offset < 0:
+           offset = 0 
+
         if not isinstance(query, str):
             raise ValueError
         if not query:
@@ -121,7 +124,8 @@ class SearchEngine(object):
         for f in results_of_search:
             list_of_files = list_of_files & f
         # create a dictionary of positions of all query tokens in files
-        final_dict = {}
+        final_dict = {} 
+        list_of_files= sorted(list_of_files)
         for i, f in enumerate(list_of_files):
 
             if i >= offset + limit:
@@ -272,6 +276,9 @@ class SearchEngine(object):
                 st = int(winLimits[f][0])
                 en = st + int(winLimits[f][1])
 
+                if st < 0:
+                   st = 0
+
                 if len(result_list) < en:
                     en = len(result_list)
 
@@ -370,7 +377,6 @@ class SearchEngine(object):
     def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
         # Searcher window with limits
-
         window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
 
         re_right = re.compile(r'[.!?] [A-ZА-Я]')
