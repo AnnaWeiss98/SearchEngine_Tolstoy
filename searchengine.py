@@ -97,11 +97,10 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
+    def multiple_search_lim(self, query, offset, limit):
 
-    def multiple_search_lim(self, query,offset,limit):
-     
-        # input limits for file keys
-        
+        # with the limits for files
+
         if not isinstance(query, str):
             raise ValueError
         if not query:
@@ -121,12 +120,12 @@ class SearchEngine(object):
         list_of_files = results_of_search[0]
         for f in results_of_search:
             list_of_files = list_of_files & f
+        # create a dictionary of positions of all query tokens in files
         final_dict = {}
-        # check file limits and form only the desired answer
-        for i,f in enumerate(list_of_files):
+        for i, f in enumerate(list_of_files):
 
-            if i >= offset+limit:
-               break
+            if i >= offset + limit:
+                break
             if i < offset:
                 continue
 
@@ -135,7 +134,6 @@ class SearchEngine(object):
                 final_dict[f].extend(self.database[token][f])
             final_dict[f].sort()
         return final_dict
-
 
     def find_window(self, findstr, window_len=3):
         """
@@ -184,9 +182,7 @@ class SearchEngine(object):
 
         return self.join_windows(windows)
 
-
-
-    def find_window_lim(self, findstr, window_len=3,offset=0,limit=0,winLimits=None):
+    def find_window_lim(self, findstr, window_len=3, offset=0, limit=0, winLimits=None):
         """
         Search database and return files
         and positions for the searched word
@@ -202,25 +198,24 @@ class SearchEngine(object):
         tokenizer = Tokenizer()
         result_dict = self.multiple_search(findstr)
 
-        for f, file_key in enumerate (result_dict.keys()):
+        for f, file_key in enumerate(result_dict.keys()):
             wins = []
-            if f >= offset+limit:
-               break
+            if f >= offset + limit:
+                break
 
             if f < offset:
                 continue
 
             result_list = result_dict[file_key]
-       
-            if winLimits is not None:
-                  st = int(winLimits[f-offset][0])
-                  en = st+int(winLimits[f-offset][1])
 
-                  if len(result_list) < en:
-                      en = len(result_list)
-                
-                  
-                  result_list = result_list[st:en]
+            if winLimits is not None:
+                st = int(winLimits[f - offset][0])
+                en = st + int(winLimits[f - offset][1])
+
+                if len(result_list) < en:
+                    en = len(result_list)
+
+                result_list = result_list[st:en]
 
             for result_position in result_list:
 
@@ -250,12 +245,13 @@ class SearchEngine(object):
             else:
                 windows[file_key] = []
 
-        return self.join_windows(windows)    
+        return self.join_windows(windows)
 
-
-    def find_window_lim_v2(self, findstr, window_len=3,offset=0,limit=0,winLimits=None):
+    def find_window_lim_v2(self, findstr, window_len=3, offset=0, limit=0, winLimits=None):
         """
-        push the file key limits into the method below
+        Search database and return files
+        and positions for the searched word
+        witch limits and limits for file transfer in multiple_search 
         """
 
         if not isinstance(findstr, str):
@@ -265,24 +261,21 @@ class SearchEngine(object):
 
         windows = {}
         tokenizer = Tokenizer()
-        result_dict = self.multiple_search_lim(findstr,offset,limit)
+        result_dict = self.multiple_search_lim(findstr, offset, limit)
 
-        for f, file_key in enumerate (result_dict.keys()):
+        for f, file_key in enumerate(result_dict.keys()):
             wins = []
 
             result_list = result_dict[file_key]
-       
+
             if winLimits is not None:
-                  st = int(winLimits[f][0])
-                  en = st+int(winLimits[f][1])
+                st = int(winLimits[f][0])
+                en = st + int(winLimits[f][1])
 
-                  if len(result_list) < en:
-                      en = len(result_list)
-                
-                  
-                  result_list = result_list[st:en]
+                if len(result_list) < en:
+                    en = len(result_list)
 
-            for result_position in result_list:
+            for wi, result_position in enumerate(result_list):
 
                 with open(file_key) as f:
                     for i, line in enumerate(f):
@@ -305,14 +298,17 @@ class SearchEngine(object):
 
                 wins.append(TokenWindow(line, [result_position], start, end))
 
+                wins = self.join_windows({file_key: wins})[file_key]
+
+                if len(wins) == st + en:
+                    break
+
             if len(wins) > 0:
-                windows[file_key] = wins
+                windows[file_key] = wins[st:]
             else:
                 windows[file_key] = []
 
-        return self.join_windows(windows)    
-
-
+        return windows
 
     def join_windows(self, in_dict):
 
@@ -341,13 +337,11 @@ class SearchEngine(object):
                         window_dict.setdefault(f, []).append(pr_win)
                     pr_win = win
             if pr_win is not None:
-               window_dict.setdefault(f, []).append(pr_win)
+                window_dict.setdefault(f, []).append(pr_win)
             else:
-               window_dict.setdefault(f, [])
+                window_dict.setdefault(f, [])
 
         return window_dict
-
-
 
     def find_supplemented_window(self, findstr, window_len):
 
@@ -373,14 +367,12 @@ class SearchEngine(object):
                         win.win_end = len(win.allString)
         return window_dict
 
-
     def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
         # Searcher window with limits
 
         window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
 
-            
         re_right = re.compile(r'[.!?] [A-ZА-Я]')
         re_left = re.compile(r'[A-ZА-Я] [.!?]')
 
