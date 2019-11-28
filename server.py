@@ -96,7 +96,9 @@ class custom_handler(BaseHTTPRequestHandler):
             result = int(value)
         except ValueError:
             pass
-        return result
+        if result >=0:
+           return result
+        return def_value
 
     def get_offset(self, act, offset, delta):
 
