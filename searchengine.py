@@ -308,7 +308,7 @@ class SearchEngine(object):
 
                 wins = self.join_windows({file_key: wins})[file_key]
 
-                if len(wins) == st + en:
+                if len(wins) == en:
                     break
 
             if len(wins) > 0:
