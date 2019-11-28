@@ -67,7 +67,7 @@ class custom_handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         result = ''
-        self.wfile.write(bytes(body.format('', '0', '4', result, '', ''), 'cp1251'))
+        self.wfile.write(bytes(body.format('', '0', '4', result, 'disabled', 'disabled'), 'cp1251'))
 
     def do_POST(self):
         """
@@ -152,6 +152,7 @@ class custom_handler(BaseHTTPRequestHandler):
                     offset_doc = 0
                     limit_doc = 5
 
+
                 o.append(offset_doc)
                 l.append(limit_doc + 1)
             else:
@@ -160,7 +161,7 @@ class custom_handler(BaseHTTPRequestHandler):
 
         limits = list(zip(o, l))
 
-        res = self.server.search_engine.find_supplemented_window_lim(findstr, 5, offset, limit + 1, limits)
+        res = self.server.search_engine.find_supplemented_window_lim(findstr, 2, offset, limit + 1, limits)
 
         disabled_f = ''
         if limit >= len(res.keys()):
