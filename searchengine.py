@@ -128,7 +128,7 @@ class SearchEngine(object):
         list_of_files= sorted(list_of_files)
         for i, f in enumerate(list_of_files):
            
-            #key clipping
+            # key clipping
             if i >= offset + limit:
                 break
             if i < offset:
