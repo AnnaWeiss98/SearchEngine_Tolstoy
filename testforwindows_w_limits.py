@@ -125,8 +125,7 @@ class WindowsTest (unittest.TestCase):
 
 
     def test_get_window_simple_two_line(self):
-        result = self.x.find_supplemented_window_lim('Вторая', 1,0,1,[(0,1)])
-        print (result)
+        result = self.x.find_supplemented_window_lim('Вторая', 1,0,1,[(0,1)])       
         res = result['test_window_three.txt'][0]
         win = TokenWindow(self.strr4, [Position(0, 6, 1)], 0, 25)
         ideal = {'test_window_three.txt': [win]}       
