@@ -75,7 +75,8 @@ class WindowsTest (unittest.TestCase):
     def test_wrong_input_error(self):
         with self.assertRaises(ValueError):
             files = ['test_window_one.txt']
-            win = self.x.find_supplemented_window_lim(files, 3,0,1,[(0,1)])
+            #3-window depth, 0-first file, 1-number of files, print the first result from zero
+            win = self.x.find_supplemented_window_lim(files, 3,0,1,[(0,1)]) 
 
     def test_absent_key(self):
         result = self.x.find_supplemented_window_lim('zzzz',1,0,1,[(0,1)])
@@ -99,7 +100,7 @@ class WindowsTest (unittest.TestCase):
         result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(0,1)])
         res = result['test_window_one.txt'][0]
         win = TokenWindow(self.strr, [Position(11, 15, 0)], 0, 50)
-        ideal = {'test_window_one.txt': [win]}     
+        ideal = {'test_window_one.txt': [win]}        
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
@@ -117,7 +118,7 @@ class WindowsTest (unittest.TestCase):
         result = self.x.find_supplemented_window_lim('нашу', 2,0,1,[(0,1)])
         res = result['test_window_two.txt'][0]
         win = TokenWindow(self.strr2, [Position(13, 17, 0)], 0, 49)
-        ideal = {'test_window_two.txt': [win]}        
+        ideal = {'test_window_two.txt': [win]}
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
@@ -166,7 +167,7 @@ class WindowsTest (unittest.TestCase):
 
 
     def test_get_window_wrong_offset(self):
-        result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(2,1)])        
+        result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(2,1)])
         res =result['test_window_one.txt']
         ideal = {'test_window_one.txt': []}
         self.assertEqual(res, [])
