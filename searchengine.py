@@ -97,6 +97,8 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
+
+
     def multiple_search_lim(self, query, offset, limit):
 
         # with the limits for files
@@ -139,6 +141,73 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
+
+
+    def multiple_search_lim_gen(self, query, offset, limit):
+
+        # with the limits for files
+
+        if offset < 0:
+           offset = 0 
+
+        if not isinstance(query, str):
+            raise ValueError
+        if not query:
+            return {}
+
+        tokenizer = Tokenizer()
+        # tokenisation of query, create list of tokens
+        searchlist = []
+        for token in tokenizer.tokenize_generator_type(query):
+            if token.t == 'A' or token.t == 'D':
+                searchlist.append(token.s)
+
+        # search each token from query
+        results_of_search = []
+        for token in searchlist:
+            results_of_search.append(set(self.search(token)))
+
+        # find files with all words from query
+        list_of_files = results_of_search[0]
+        for f in results_of_search:
+            list_of_files = list_of_files & f
+
+
+        # create a dictionary of positions of all query tokens in files
+        final_dict = {} 
+        list_of_files= sorted(list_of_files)
+        for i, f in enumerate(list_of_files):
+
+            if i >= offset + limit:
+                break
+
+            if i < offset:
+                continue
+
+            lists = []
+            for token in searchlist:
+                lists.append(self.database[token][f])
+
+            final_dict[f] = self.generator(lists)
+ 
+        return final_dict
+
+
+    def generator(self,lists):
+        iters = [iter(l) for l in lists] # turn lists into iterators
+        firsts = [next(it) for it in iters] #list with first list items
+
+        while (len(firsts) != 0):
+           m = min(firsts)
+           yield m
+           mpos = firsts.index(m)
+           try:
+              firsts[mpos]=next(iters[mpos]) # go to the next item in this list
+           except StopIteration:
+              iters.pop(mpos)
+              firsts.pop(mpos)
+
+
     def find_window(self, findstr, window_len=3):
         """
         Search database and return files
@@ -179,12 +248,18 @@ class SearchEngine(object):
                         break
                 end = result_position.start + token.position + len(token.s)
 
-                wins.append(TokenWindow(line, [result_position], start, end))
+
+                win = TokenWindow(line, [result_position], start, end) # create new window 
+                win = self.supplemented_window(win)                    # expanding the window to the borders of the proposals 
+                wins.append(win)                                       # addind window to dictionary
+                wins = self.join_windows({file_key: wins})[file_key]   # connection of Windows
+
+
 
             if len(wins) > 0:
                 windows[file_key] = wins
 
-        return self.join_windows(windows)
+        return windows
 
     def find_window_lim(self, findstr, window_len=3, offset=0, limit=0, winLimits=None):
         """
@@ -242,14 +317,19 @@ class SearchEngine(object):
                         break
                 end = result_position.start + token.position + len(token.s)
 
-                wins.append(TokenWindow(line, [result_position], start, end))
+
+                win = TokenWindow(line, [result_position], start, end) # create new window 
+                win = self.supplemented_window(win)                    # expanding the window to the borders of the proposals 
+                wins.append(win)                                       # addind window to dictionary
+                wins = self.join_windows({file_key: wins})[file_key]   # connection of Windows
+
 
             if len(wins) > 0:
                 windows[file_key] = wins
             else:
                 windows[file_key] = []
 
-        return self.join_windows(windows)
+        return windows
 
     def find_window_lim_v2(self, findstr, window_len=3, offset=0, limit=0, winLimits=None):
         """
@@ -265,24 +345,29 @@ class SearchEngine(object):
 
         windows = {}
         tokenizer = Tokenizer()
+
+        # simply find 
         result_dict = self.multiple_search_lim(findstr, offset, limit)
+
+        # find with generators
+        #result_dict = self.multiple_search_lim_gen(findstr, offset, limit)
 
         for f, file_key in enumerate(result_dict.keys()):
             wins = []
 
             result_list = result_dict[file_key]
 
+            st = 0
+            en = 5
+   
             if winLimits is not None:
-                st = int(winLimits[f][0])      # offset for current tom
-                en = st + int(winLimits[f][1]) # offset + limit for current tom
+                st = winLimits[f][0]      # offset for current tom
+                en = st + winLimits[f][1] # offset + limit for current tom
 
                 if st < 0:
                    st = 0
 
-                if len(result_list) < en:
-                    en = len(result_list)
-
-            for wi, result_position in enumerate(result_list):
+            for result_position in result_list:
 
                 with open(file_key) as f:
                     for i, line in enumerate(f):
@@ -353,36 +438,6 @@ class SearchEngine(object):
 
         return window_dict
 
-    def find_supplemented_window(self, findstr, window_len):
-
-        # Searcher window without limits
-
-        window_dict = self.find_window(findstr, window_len)
-        re_right = re.compile(r'[.!?] [A-ZА-Я]')
-        re_left = re.compile(r'[A-ZА-Я] [.!?]')
-
-        for f, wins in window_dict.items():
-            for win in wins:
-                r = win.allString[win.win_end:]
-                l = win.allString[:win.win_start + 1][::-1]
-                if l:
-                    try:
-                        win.win_start = win.win_start - re_left.search(l).start()
-                    except:
-                        win.win_start = 0
-                if r:
-                    try:
-                        win.win_end += re_right.search(r).start() + 1
-                    except:
-                        win.win_end = len(win.allString)
-        return window_dict
-
-    def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
-
-        # Searcher window with limits
-        window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
-        return  window_dict
-
 
     def supplemented_window(self, win):
 
@@ -402,3 +457,22 @@ class SearchEngine(object):
             except:
                  win.win_end = len(win.allString)
         return win
+
+
+
+
+    def find_supplemented_window(self, findstr, window_len):
+
+        # Searcher window without limits
+        window_dict = self.find_window(findstr, window_len)
+        return  window_dict
+
+
+    def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
+
+        # Searcher window with limits
+        window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
+        return  window_dict
+
+
+
