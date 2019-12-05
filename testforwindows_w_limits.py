@@ -76,98 +76,220 @@ class WindowsTest (unittest.TestCase):
         with self.assertRaises(ValueError):
             files = ['test_window_one.txt']
             win = self.x.find_supplemented_window_lim(files, 3,0,1,[(0,1)])
+            win1 = self.x.find_supplemented_window_lim_v2(files, 3,0,1,[(0,1)])
 
     def test_absent_key(self):
         result = self.x.find_supplemented_window_lim('zzzz',1,0,1,[(0,1)])
+        result1 = self.x.find_supplemented_window_lim_v2('zzzz',1,0,1,[(0,1)])
         self.assertEqual(result, {})
+        self.assertEqual(result1, {})
+        self.assertEqual(result, result1)
 
     def test_empty_string(self):
         result = self.x.find_supplemented_window_lim('',1,0,1,[(0,1)])
+        result1 = self.x.find_supplemented_window_lim_v2('',1,0,1,[(0,1)])
         self.assertIsInstance(result, dict)
+        self.assertIsInstance(result1, dict)
         self.assertEqual(result, {})
+        self.assertEqual(result1, {})
+        self.assertEqual(result, result1)
 
     def test_get_window_begin(self):       
         result = self.x.find_supplemented_window_lim('sun',1,0,1,[(0,1)])
         res = result['test_window_one.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('sun',1,0,1,[(0,1)])
+        res1 = result1['test_window_one.txt'][0]
+
         win = TokenWindow(self.strr, [Position(0, 3, 0)], 0, 50)
         ideal = {'test_window_one.txt': [win]}
+
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
+
+        self.assertEqual(res1.allString, win.allString)
+        self.assertEqual(res1, win)
+        self.assertEqual(result1, ideal)
+
 
     def test_get_window_simple(self):
         result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(0,1)])
         res = result['test_window_one.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('tree', 2,0,1,[(0,1)])
+        res1 = result1['test_window_one.txt'][0]
+
         win = TokenWindow(self.strr, [Position(11, 15, 0)], 0, 50)
-        ideal = {'test_window_one.txt': [win]}        
+        ideal = {'test_window_one.txt': [win]}
+        
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
+
+        self.assertEqual(res1.allString, win.allString)
+        self.assertEqual(res1, win)
+        self.assertEqual(result1, ideal)
+
 
     def test_get_window_end(self):
         result = self.x.find_supplemented_window_lim('good', 1,0,1,[(0,1)])
         res = result['test_window_one.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('good', 1,0,1,[(0,1)])
+        res1 = result1['test_window_one.txt'][0]
+
         win = TokenWindow(self.strr, [Position(46, 50, 0)], 0, 50)
-        ideal = {'test_window_one.txt': [win]}        
+        ideal = {'test_window_one.txt': [win]}
+        
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
+
+        self.assertEqual(res1.allString, win.allString)
+        self.assertEqual(res1, win)
+        self.assertEqual(result1, ideal)
 
     def test_get_window_simple2(self):
         result = self.x.find_supplemented_window_lim('нашу', 2,0,1,[(0,1)])
         res = result['test_window_two.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('нашу', 2,0,1,[(0,1)])
+        res1 = result1['test_window_two.txt'][0]
+
         win = TokenWindow(self.strr2, [Position(13, 17, 0)], 0, 49)
-        ideal = {'test_window_two.txt': [win]}        
+        ideal = {'test_window_two.txt': [win]}
+        
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
 
+        self.assertEqual(res1.allString, win.allString)
+        self.assertEqual(res1, win)
+        self.assertEqual(result1, ideal)
+
+
     def test_get_window_simple_two_line(self):
         result = self.x.find_supplemented_window_lim('Вторая', 1,0,1,[(0,1)])
         res = result['test_window_three.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('Вторая', 1,0,1,[(0,1)])
+        res1 = result1['test_window_three.txt'][0]
+
         win = TokenWindow(self.strr4, [Position(0, 6, 1)], 0, 25)
-        ideal = {'test_window_three.txt': [win]}       
+        ideal = {'test_window_three.txt': [win]}
+       
         self.assertEqual(res.allString, win.allString)
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
+
+        self.assertEqual(res1.allString, win.allString)
+        self.assertEqual(res1, win)
+        self.assertEqual(result1, ideal)
+
 
     def test_get_window_two_result(self):
         result = self.x.find_supplemented_window_lim('тестов', 1,0,1,[(0,2)])
         res1 = result['test_window_three.txt'][0]
         res2 = result['test_window_three.txt'][1]
+
+        result1 = self.x.find_supplemented_window_lim_v2('тестов', 1,0,1,[(0,2)])
+        res11 = result1['test_window_three.txt'][0]
+        res21 = result1['test_window_three.txt'][1]
+
+
         win1 = TokenWindow(self.strr3.replace('\n',''), [Position(18, 24, 0)], 0, 25)
         win2 = TokenWindow(self.strr4, [Position(18, 24, 1)], 0, 25)
+
         ideal = {'test_window_three.txt': [win1,win2]}
+
         self.assertEqual(res1.allString, win1.allString)
         self.assertEqual(res1, win1)
         self.assertEqual(res2.allString, win2.allString)
         self.assertEqual(res2, win2)
         self.assertEqual(result, ideal)
 
+        self.assertEqual(res11.allString, win1.allString)
+        self.assertEqual(res11, win1)
+        self.assertEqual(res21.allString, win2.allString)
+        self.assertEqual(res21, win2)
+        self.assertEqual(result1, ideal)
+
+
     def test_get_window_two_result2(self):
         result = self.x.find_supplemented_window_lim('тестов', 1,0,1,[(0,1)])
         res1 = result['test_window_three.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('тестов', 1,0,1,[(0,1)])
+        res11 = result1['test_window_three.txt'][0]
+
+
         win1 = TokenWindow(self.strr3.replace('\n',''), [Position(18, 24, 0)], 0, 25)
         ideal = {'test_window_three.txt': [win1]}
+
         self.assertEqual(res1.allString, win1.allString)
         self.assertEqual(res1, win1)
         self.assertEqual(result, ideal)
+
+        self.assertEqual(res11.allString, win1.allString)
+        self.assertEqual(res11, win1)
+        self.assertEqual(result1, ideal)
+
+
 
     def test_get_window_two_result3(self):
         result = self.x.find_supplemented_window_lim('тестов', 1,0,1,[(1,2)])
         res1 = result['test_window_three.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('тестов', 1,0,1,[(1,2)])
+        res11 = result1['test_window_three.txt'][0]
+
+
         win1 = TokenWindow(self.strr4.replace('\n',''), [Position(18, 24, 1)], 0, 25)
         ideal = {'test_window_three.txt': [win1]}
+
         self.assertEqual(res1.allString, win1.allString)
         self.assertEqual(res1, win1)
         self.assertEqual(result, ideal)
 
+        self.assertEqual(res11.allString, win1.allString)
+        self.assertEqual(res11, win1)
+        self.assertEqual(result1, ideal)
+
+
+    def test_get_window_two_word(self):
+        result = self.x.find_supplemented_window_lim('Мы работы', 2,0,1,[(0,2)])
+        res = result['test_window_two.txt'][0]
+
+        result1 = self.x.find_supplemented_window_lim_v2('Мы работы', 2,0,1,[(0,2)])
+        res1 = result1['test_window_two.txt'][0]
+
+        win = TokenWindow(self.strr2, [Position(0, 2, 0),Position(32, 38, 0)], 0, 49)
+        ideal = {'test_window_two.txt': [win]}
+        
+        self.assertEqual(res.allString, win.allString)
+        self.assertEqual(res, win)
+        self.assertEqual(result, ideal)
+
+        self.assertEqual(res1.allString, win.allString)
+        self.assertEqual(res1, win)
+        self.assertEqual(result1, ideal)
+
+
     def test_get_window_wrong_offset(self):
-        result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(2,1)])        
+        result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(2,1)])
+
+        result1 = self.x.find_supplemented_window_lim_v2('tree', 2,0,1,[(2,1)])
+        
         res =result['test_window_one.txt']
+        res1=result1['test_window_one.txt']
+
         ideal = {'test_window_one.txt': []}
         self.assertEqual(res, [])
         self.assertEqual(result, ideal)
+
+        self.assertEqual(res1, [])
+        self.assertEqual(result1, ideal)
 
 
 
