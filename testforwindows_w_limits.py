@@ -122,7 +122,6 @@ class WindowsTest (unittest.TestCase):
         self.assertEqual(res, win)
         self.assertEqual(result, ideal)
 
-
     def test_get_window_simple_two_line(self):
         result = self.x.find_supplemented_window_lim('Вторая', 1,0,1,[(0,1)])
         res = result['test_window_three.txt'][0]
@@ -162,7 +161,6 @@ class WindowsTest (unittest.TestCase):
         self.assertEqual(res1.allString, win1.allString)
         self.assertEqual(res1, win1)
         self.assertEqual(result, ideal)
-
 
     def test_get_window_wrong_offset(self):
         result = self.x.find_supplemented_window_lim('tree', 2,0,1,[(2,1)])        
