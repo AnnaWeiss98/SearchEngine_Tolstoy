@@ -195,7 +195,7 @@ class SearchEngine(object):
 
     def generator(self,lists):
         iters = [iter(l) for l in lists] # turn lists into iterators
-        firsts = [next(it) for it in iters] #list with first list items
+        firsts = [next(it) for it in iters] # list with first list items
 
         while (len(firsts) != 0):
            m = min(firsts)
@@ -399,7 +399,7 @@ class SearchEngine(object):
                     break
 
             if len(wins) > 0:
-                windows[file_key] = wins[st:] #return the Windows from the required position (offset)
+                windows[file_key] = wins[st:] # return the Windows from the required position (offset)
             else:
                 windows[file_key] = []
 
