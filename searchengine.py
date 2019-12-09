@@ -50,20 +50,28 @@ class SearchEngine(object):
     Class containing methods for working with database.
     """
 
-    def __init__(self, database):
+    def __init__(self, database=''):
         """
         Create an instance of SearchEngine class.
         """
-        self.database = shelve.open(database)
+        if database != '':
+           self.database = shelve.open(database)
+        else:
+           self.database = None
 
     def __del__(self):
-        self.database.close()
+ 
+        if self.database is not None: 
+             self.database.close()
 
     def search(self, query):
         """
         Search database and return files
         and positions for the searched word
         """
+        if self.database is None:
+             return {} 
+
         if not isinstance(query, str):
             raise ValueError
         return self.database.get(query, {})
@@ -71,7 +79,7 @@ class SearchEngine(object):
     def multiple_search(self, query):
         if not isinstance(query, str):
             raise ValueError
-        if not query:
+        if not query or self.database is None:
             return {}
 
         tokenizer = Tokenizer()
@@ -108,7 +116,7 @@ class SearchEngine(object):
 
         if not isinstance(query, str):
             raise ValueError
-        if not query:
+        if not query or self.database is None:
             return {}
 
         tokenizer = Tokenizer()
@@ -152,7 +160,7 @@ class SearchEngine(object):
 
         if not isinstance(query, str):
             raise ValueError
-        if not query:
+        if not query or self.database is None:
             return {}
 
         tokenizer = Tokenizer()
@@ -188,21 +196,21 @@ class SearchEngine(object):
             for token in searchlist:
                 lists.append(self.database[token][f])
 
-            final_dict[f] = self.generator(lists)
+            final_dict[f] = self.merge_and_sort_lists(lists)
  
         return final_dict
 
 
-    def generator(self,lists):
-        iters = [iter(l) for l in lists] # turn lists into iterators
-        firsts = [next(it) for it in iters] # list with first list items
+    def merge_and_sort_lists(self,lists):
+        iters = [iter(l) for l in lists if len(l)>0]
+        firsts = [next(it) for it in iters]
 
         while (len(firsts) != 0):
            m = min(firsts)
            yield m
            mpos = firsts.index(m)
            try:
-              firsts[mpos]=next(iters[mpos]) # go to the next item in this list
+              firsts[mpos]=next(iters[mpos])
            except StopIteration:
               iters.pop(mpos)
               firsts.pop(mpos)
@@ -347,10 +355,10 @@ class SearchEngine(object):
         tokenizer = Tokenizer()
 
         # simply find 
-        result_dict = self.multiple_search_lim(findstr, offset, limit)
+        #result_dict = self.multiple_search_lim(findstr, offset, limit)
 
         # find with generators
-        #result_dict = self.multiple_search_lim_gen(findstr, offset, limit)
+        result_dict = self.multiple_search_lim_gen(findstr, offset, limit)
 
         for f, file_key in enumerate(result_dict.keys()):
             wins = []
@@ -399,7 +407,7 @@ class SearchEngine(object):
                     break
 
             if len(wins) > 0:
-                windows[file_key] = wins[st:] # return the Windows from the required position (offset)
+                windows[file_key] = wins[st:] #return the Windows from the required position (offset)
             else:
                 windows[file_key] = []
 
@@ -468,10 +476,16 @@ class SearchEngine(object):
         return  window_dict
 
 
-    def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
+    def find_supplemented_window_lim_v2(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
         # Searcher window with limits
         window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
+        return  window_dict
+
+    def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
+
+        # Searcher window with limits
+        window_dict = self.find_window_lim(findstr, window_len, offset, limit, winLimits)
         return  window_dict
 
 
