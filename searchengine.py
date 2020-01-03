@@ -55,14 +55,14 @@ class SearchEngine(object):
         Create an instance of SearchEngine class.
         """
         if database != '':
-           self.database = shelve.open(database)
+            self.database = shelve.open(database)
         else:
-           self.database = None
+            self.database = None
 
     def __del__(self):
- 
-        if self.database is not None: 
-             self.database.close()
+
+        if self.database is not None:
+            self.database.close()
 
     def search(self, query):
         """
@@ -70,7 +70,7 @@ class SearchEngine(object):
         and positions for the searched word
         """
         if self.database is None:
-             return {} 
+            return {}
 
         if not isinstance(query, str):
             raise ValueError
@@ -105,14 +105,12 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-
-
     def multiple_search_lim(self, query, offset, limit):
 
         # with the limits for files
 
         if offset < 0:
-           offset = 0 
+            offset = 0
 
         if not isinstance(query, str):
             raise ValueError
@@ -134,8 +132,8 @@ class SearchEngine(object):
         for f in results_of_search:
             list_of_files = list_of_files & f
         # create a dictionary of positions of all query tokens in files
-        final_dict = {} 
-        list_of_files= sorted(list_of_files)
+        final_dict = {}
+        list_of_files = sorted(list_of_files)
         for i, f in enumerate(list_of_files):
 
             if i >= offset + limit:
@@ -149,14 +147,12 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-
-
     def multiple_search_lim_gen(self, query, offset, limit):
 
         # with the limits for files
 
         if offset < 0:
-           offset = 0 
+            offset = 0
 
         if not isinstance(query, str):
             raise ValueError
@@ -180,10 +176,9 @@ class SearchEngine(object):
         for f in results_of_search:
             list_of_files = list_of_files & f
 
-
         # create a dictionary of positions of all query tokens in files
-        final_dict = {} 
-        list_of_files= sorted(list_of_files)
+        final_dict = {}
+        list_of_files = sorted(list_of_files)
         for i, f in enumerate(list_of_files):
 
             if i >= offset + limit:
@@ -197,24 +192,22 @@ class SearchEngine(object):
                 lists.append(self.database[token][f])
 
             final_dict[f] = self.merge_and_sort_lists(lists)
- 
+
         return final_dict
 
-
-    def merge_and_sort_lists(self,lists):
-        iters = [iter(l) for l in lists if len(l)>0]
+    def merge_and_sort_lists(self, lists):
+        iters = [iter(l) for l in lists if len(l) > 0]
         firsts = [next(it) for it in iters]
 
         while (len(firsts) != 0):
-           m = min(firsts)
-           yield m
-           mpos = firsts.index(m)
-           try:
-              firsts[mpos]=next(iters[mpos])
-           except StopIteration:
-              iters.pop(mpos)
-              firsts.pop(mpos)
-
+            m = min(firsts)
+            yield m
+            mpos = firsts.index(m)
+            try:
+                firsts[mpos] = next(iters[mpos])
+            except StopIteration:
+                iters.pop(mpos)
+                firsts.pop(mpos)
 
     def find_window(self, findstr, window_len=3):
         """
@@ -256,13 +249,10 @@ class SearchEngine(object):
                         break
                 end = result_position.start + token.position + len(token.s)
 
-
-                win = TokenWindow(line, [result_position], start, end) # create new window 
-                win = self.supplemented_window(win)                    # expanding the window to the borders of the proposals 
-                wins.append(win)                                       # addind window to dictionary
-                wins = self.join_windows({file_key: wins})[file_key]   # connection of Windows
-
-
+                win = TokenWindow(line, [result_position], start, end)  # create new window
+                win = self.supplemented_window(win)  # expanding the window to the borders of the proposals
+                wins.append(win)  # addind window to dictionary
+                wins = self.join_windows({file_key: wins})[file_key]  # connection of Windows
 
             if len(wins) > 0:
                 windows[file_key] = wins
@@ -325,12 +315,10 @@ class SearchEngine(object):
                         break
                 end = result_position.start + token.position + len(token.s)
 
-
-                win = TokenWindow(line, [result_position], start, end) # create new window 
-                win = self.supplemented_window(win)                    # expanding the window to the borders of the proposals 
-                wins.append(win)                                       # addind window to dictionary
-                wins = self.join_windows({file_key: wins})[file_key]   # connection of Windows
-
+                win = TokenWindow(line, [result_position], start, end)  # create new window
+                win = self.supplemented_window(win)  # expanding the window to the borders of the proposals
+                wins.append(win)  # addind window to dictionary
+                wins = self.join_windows({file_key: wins})[file_key]  # connection of Windows
 
             if len(wins) > 0:
                 windows[file_key] = wins
@@ -355,7 +343,7 @@ class SearchEngine(object):
         tokenizer = Tokenizer()
 
         # simply find 
-        #result_dict = self.multiple_search_lim(findstr, offset, limit)
+        # result_dict = self.multiple_search_lim(findstr, offset, limit)
 
         # find with generators
         result_dict = self.multiple_search_lim_gen(findstr, offset, limit)
@@ -367,13 +355,13 @@ class SearchEngine(object):
 
             st = 0
             en = 5
-   
+
             if winLimits is not None:
-                st = winLimits[f][0]      # offset for current tom
-                en = st + winLimits[f][1] # offset + limit for current tom
+                st = winLimits[f][0]  # offset for current tom
+                en = st + winLimits[f][1]  # offset + limit for current tom
 
                 if st < 0:
-                   st = 0
+                    st = 0
 
             for result_position in result_list:
 
@@ -396,18 +384,17 @@ class SearchEngine(object):
                         break
                 end = result_position.start + token.position + len(token.s)
 
-
-                win = TokenWindow(line, [result_position], start, end) # create new window 
-                win = self.supplemented_window(win)                    # expanding the window to the borders of the proposals 
-                wins.append(win)                                       # addind window to dictionary
-                wins = self.join_windows({file_key: wins})[file_key]   # connection of Windows
+                win = TokenWindow(line, [result_position], start, end)  # create new window
+                win = self.supplemented_window(win)  # expanding the window to the borders of the proposals
+                wins.append(win)  # addind window to dictionary
+                wins = self.join_windows({file_key: wins})[file_key]  # connection of Windows
 
                 # stop when the required number of Windows is found
                 if len(wins) == en:
                     break
 
             if len(wins) > 0:
-                windows[file_key] = wins[st:] #return the Windows from the required position (offset)
+                windows[file_key] = wins[st:]  # return the Windows from the required position (offset)
             else:
                 windows[file_key] = []
 
@@ -446,7 +433,6 @@ class SearchEngine(object):
 
         return window_dict
 
-
     def supplemented_window(self, win):
 
         re_right = re.compile(r'[.!?] [A-ZА-Я]')
@@ -456,37 +442,131 @@ class SearchEngine(object):
         l = win.allString[:win.win_start + 1][::-1]
         if l:
             try:
-               win.win_start = win.win_start - re_left.search(l).start()
+                win.win_start = win.win_start - re_left.search(l).start()
             except:
-               win.win_start = 0
+                win.win_start = 0
         if r:
             try:
-                 win.win_end += re_right.search(r).start() + 1
+                win.win_end += re_right.search(r).start() + 1
             except:
-                 win.win_end = len(win.allString)
+                win.win_end = len(win.allString)
         return win
-
-
-
 
     def find_supplemented_window(self, findstr, window_len):
 
         # Searcher window without limits
         window_dict = self.find_window(findstr, window_len)
-        return  window_dict
-
+        return window_dict
 
     def find_supplemented_window_lim_v2(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
         # Searcher window with limits
         window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
-        return  window_dict
+        return window_dict
 
     def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
         # Searcher window with limits
         window_dict = self.find_window_lim(findstr, window_len, offset, limit, winLimits)
-        return  window_dict
+        return window_dict
 
+    def find_supplemented_window_lim_v3(self, findstr, window_len, offset=0, limit=0, winLimits=None):
 
+        # Searcher window with limits
+        window_dict = self.find_window_lim_v3(findstr, window_len, offset, limit, winLimits)
+        return window_dict
 
+    def find_window_lim_v3(self, findstr, window_len=3, offset=0, limit=0, winLimits=None):
+        """
+        Search database and return files
+        and positions for the searched word
+        witch limits and limits for file transfer in multiple_search
+        """
+        if not isinstance(findstr, str):
+            raise ValueError
+        if not findstr:
+            return {}
+
+        # find with generators
+        result_dict = self.multiple_search_lim_gen(findstr, offset, limit)
+        windows = {}
+        for f, file_key in enumerate(result_dict.keys()):
+            res = self.context_window_generator(file_key, result_dict[file_key], window_len)
+            ress = self.join_windows_gen(res)
+
+            st = 0
+            en = 5
+            if winLimits is not None:
+                st = winLimits[f][0]  # offset for current tom
+                en = st + winLimits[f][1]  # offset + limit for current tom
+
+            if st < 0:
+                st = 0
+
+            wins = []
+            for r in ress:
+                wins.append(r)  # addind window to dictionary
+                # stop when the required number of Windows is found
+                if len(wins) == en:
+                    break
+
+            if len(wins) > 0:
+                windows[file_key] = wins[st:]  # return the Windows from the required position (offset)
+            else:
+                windows[file_key] = []
+        return windows
+
+    def context_window_generator(self, file_name, contexts, window_len=3):
+
+        tokenizer = Tokenizer()
+        for result_position in contexts:
+
+            with open(file_name) as f:
+                for i, line in enumerate(f):
+                    if i == result_position.string:
+                        break
+            line = line.strip("\n")
+
+            right_context = line[result_position.start:]
+            left_context = line[:result_position.end][::-1]
+
+            for i, token in enumerate(tokenizer.generate_type_AD(left_context)):
+                if i == window_len:
+                    break
+            start = result_position.end - token.position - len(token.s)
+
+            for i, token in enumerate(tokenizer.generate_type_AD(right_context)):
+                if i == window_len:
+                    break
+            end = result_position.start + token.position + len(token.s)
+
+            win = TokenWindow(line, [result_position], start, end)  # create new window
+            win = self.supplemented_window(win)  # expanding the window to the borders of the proposals
+            yield win
+
+    def join_windows_gen(self, in_dict):
+        pr_win = None
+        for win in in_dict:
+            if pr_win is not None and pr_win.window_is_junction(win):
+                for pos in win.positions:
+                    if pos not in pr_win.positions:
+                        pr_win.positions.append(pos)
+                        """
+                        he looks at whether the pr_win variable is defined,
+                        if yes, then checks whether the windows intersect,
+                        if yes then intersects. otherwise, it looks again
+                        whether the pr_win variable is defined; if so, it
+                        adds it to the window array. pr_win equates to the
+                        current window
+                        """
+
+                pr_win.win_start = min(pr_win.win_start, win.win_start)
+                pr_win.win_end = max(pr_win.win_end, win.win_end)
+            else:
+                if pr_win is not None:
+                    yield pr_win
+
+                pr_win = win
+
+        if pr_win is not None:
+            yield pr_win
