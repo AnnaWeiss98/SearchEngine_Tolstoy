@@ -87,7 +87,7 @@ class custom_handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
-        print (postvars)
+        #print (postvars)
         self.wfile.write(bytes(self.gen_page(postvars), 'cp1251'))
 
     def get_int(self, value, def_value):
@@ -163,7 +163,7 @@ class custom_handler(BaseHTTPRequestHandler):
 
         limits = list(zip(o, l))
 
-        res = self.server.search_engine.find_supplemented_window_lim(findstr, 2, offset, limit + 1, limits)
+        res = self.server.search_engine.find_supplemented_window_lim_v3(findstr, 2, offset, limit + 1, limits)
 
         disabled_f = ''
         if limit >= len(res.keys()):
