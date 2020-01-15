@@ -83,21 +83,20 @@ class SearchEngine(object):
             return {}
 
         tokenizer = Tokenizer()
-        # tokenisation of query, create list of tokens
+        """
+        tokenisation of query, create list of tokens
+        """
         searchlist = []
         for token in tokenizer.tokenize_generator_type(query):
             if token.t == 'A' or token.t == 'D':
-                searchlist.append(token.s)
-        # search each token from query
-        results_of_search = []
+                searchlist.append(token.s)       
+        results_of_search = []   # search each token from query
         for token in searchlist:
-            results_of_search.append(set(self.search(token)))
-        # find files with all words from query
-        list_of_files = results_of_search[0]
+            results_of_search.append(set(self.search(token)))        
+        list_of_files = results_of_search[0]    # find files with all words from query
         for f in results_of_search:
-            list_of_files = list_of_files & f
-        # create a dictionary of positions of all query tokens in files
-        final_dict = {}
+            list_of_files = list_of_files & f       
+        final_dict = {}  # create a dictionary of positions of all query tokens in files
         for f in list_of_files:
             final_dict[f] = []
             for token in searchlist:
@@ -105,9 +104,7 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-    def multiple_search_lim(self, query, offset, limit):
-
-        # with the limits for files
+    def multiple_search_lim(self, query, offset, limit):    # with the limits for files
 
         if offset < 0:
             offset = 0
@@ -118,21 +115,20 @@ class SearchEngine(object):
             return {}
 
         tokenizer = Tokenizer()
-        # tokenisation of query, create list of tokens
+        """
+        tokenisation of query, create list of tokens
+        """
         searchlist = []
         for token in tokenizer.tokenize_generator_type(query):
             if token.t == 'A' or token.t == 'D':
                 searchlist.append(token.s)
-        # search each token from query
-        results_of_search = []
+        results_of_search = []   # search each token from query
         for token in searchlist:
             results_of_search.append(set(self.search(token)))
-        # find files with all words from query
-        list_of_files = results_of_search[0]
+        list_of_files = results_of_search[0]     # find files with all words from query
         for f in results_of_search:
             list_of_files = list_of_files & f
-        # create a dictionary of positions of all query tokens in files
-        final_dict = {}
+        final_dict = {}  # create a dictionary of positions of all query tokens in files
         list_of_files = sorted(list_of_files)
         for i, f in enumerate(list_of_files):
 
@@ -147,9 +143,7 @@ class SearchEngine(object):
             final_dict[f].sort()
         return final_dict
 
-    def multiple_search_lim_gen(self, query, offset, limit):
-
-        # with the limits for files
+    def multiple_search_lim_gen(self, query, offset, limit):     # with the limits for files
 
         if offset < 0:
             offset = 0
@@ -160,24 +154,23 @@ class SearchEngine(object):
             return {}
 
         tokenizer = Tokenizer()
-        # tokenisation of query, create list of tokens
+        """
+        tokenisation of query, create list of tokens
+        """
         searchlist = []
         for token in tokenizer.tokenize_generator_type(query):
             if token.t == 'A' or token.t == 'D':
                 searchlist.append(token.s)
-
-        # search each token from query
-        results_of_search = []
+                
+        results_of_search = []   # search each token from query
         for token in searchlist:
             results_of_search.append(set(self.search(token)))
 
-        # find files with all words from query
-        list_of_files = results_of_search[0]
+        list_of_files = results_of_search[0]    # find files with all words from query
         for f in results_of_search:
             list_of_files = list_of_files & f
 
-        # create a dictionary of positions of all query tokens in files
-        final_dict = {}
+        final_dict = {}      # create a dictionary of positions of all query tokens in files
         list_of_files = sorted(list_of_files)
         for i, f in enumerate(list_of_files):
 
@@ -389,9 +382,9 @@ class SearchEngine(object):
                 wins.append(win)  # addind window to dictionary
                 wins = self.join_windows({file_key: wins})[file_key]  # connection of Windows
 
-                # stop when the required number of Windows is found
+                
                 if len(wins) == en:
-                    break
+                    break   # stop when the required number of Windows is found
 
             if len(wins) > 0:
                 windows[file_key] = wins[st:]  # return the Windows from the required position (offset)
@@ -453,28 +446,35 @@ class SearchEngine(object):
         return win
 
     def find_supplemented_window(self, findstr, window_len):
-
-        # Searcher window without limits
+        """
+        Searcher window without limits
+        """
         window_dict = self.find_window(findstr, window_len)
         return window_dict
 
     def find_supplemented_window_lim_v2(self, findstr, window_len, offset=0, limit=0, winLimits=None):
-
-        # Searcher window with limits
+        """
+        Searcher window with limits. Key limits are processed in
+        the method multiple_search_lim or multiple_search_lim_gen
+        """
         window_dict = self.find_window_lim_v2(findstr, window_len, offset, limit, winLimits)
         return window_dict
 
     def find_supplemented_window_lim(self, findstr, window_len, offset=0, limit=0, winLimits=None):
-
-        # Searcher window with limits
+        """
+        Searcher window with limits. Key limits are processed in this method
+        """
         window_dict = self.find_window_lim(findstr, window_len, offset, limit, winLimits)
         return window_dict
 
     def find_supplemented_window_lim_v3(self, findstr, window_len, offset=0, limit=0, winLimits=None):
-
-        # Searcher window with limits
+        """
+        Searcher window with limits. Working with
+        generators in all methods except the last one
+        """
         window_dict = self.find_window_lim_v3(findstr, window_len, offset, limit, winLimits)
         return window_dict
+
 
     def find_window_lim_v3(self, findstr, window_len=3, offset=0, limit=0, winLimits=None):
         """
@@ -489,10 +489,18 @@ class SearchEngine(object):
 
         # find with generators
         result_dict = self.multiple_search_lim_gen(findstr, offset, limit)
+
         windows = {}
         for f, file_key in enumerate(result_dict.keys()):
-            res = self.context_window_generator(file_key, result_dict[file_key], window_len)
-            ress = self.join_windows_gen(res)
+            """
+            Create window for window_len. Return generator
+            with window to the borders of the proposals 
+            """
+            context_wins_gen = self.context_window_generator(file_key, result_dict[file_key], window_len)
+            """
+            connection of Windows. Return generator with 
+            """
+            join_wins_gen = self.join_windows_gen(context_wins_gen)
 
             st = 0
             en = 5
@@ -504,11 +512,10 @@ class SearchEngine(object):
                 st = 0
 
             wins = []
-            for r in ress:
+            for r in join_wins_gen:
                 wins.append(r)  # addind window to dictionary
-                # stop when the required number of Windows is found
                 if len(wins) == en:
-                    break
+                    break   # stop when the required number of Windows is found
 
             if len(wins) > 0:
                 windows[file_key] = wins[st:]  # return the Windows from the required position (offset)
@@ -516,11 +523,17 @@ class SearchEngine(object):
                 windows[file_key] = []
         return windows
 
-    def context_window_generator(self, file_name, contexts, window_len=3):
 
+    
+    def context_window_generator(self, file_name, contexts, window_len=3):
+        """
+        Generator context window with window_len  
+        """
         tokenizer = Tokenizer()
         for result_position in contexts:
-
+            """
+            Find line for position
+            """
             with open(file_name) as f:
                 for i, line in enumerate(f):
                     if i == result_position.string:
@@ -529,22 +542,32 @@ class SearchEngine(object):
 
             right_context = line[result_position.start:]
             left_context = line[:result_position.end][::-1]
-
+            """
+            Expanding the boundaries of the window according to the specified parameter
+            Calculating of the beginning
+            """
             for i, token in enumerate(tokenizer.generate_type_AD(left_context)):
                 if i == window_len:
                     break
             start = result_position.end - token.position - len(token.s)
-
+            """
+            Expanding the boundaries of the window according to the specified parameter
+            Calculating the end
+            """
             for i, token in enumerate(tokenizer.generate_type_AD(right_context)):
                 if i == window_len:
                     break
             end = result_position.start + token.position + len(token.s)
 
             win = TokenWindow(line, [result_position], start, end)  # create new window
-            win = self.supplemented_window(win)  # expanding the window to the borders of the proposals
+            win = self.supplemented_window(win)  # expande the window to the borders of the proposals
+
             yield win
 
     def join_windows_gen(self, in_dict):
+        """
+        Generator join window  
+        """
         pr_win = None
         for win in in_dict:
             if pr_win is not None and pr_win.window_is_junction(win):
