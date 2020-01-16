@@ -498,7 +498,7 @@ class SearchEngine(object):
             """
             context_wins_gen = self.context_window_generator(file_key, result_dict[file_key], window_len)
             """
-            connection of Windows. Return generator with 
+            Return generator with connection of Windows.
             """
             join_wins_gen = self.join_windows_gen(context_wins_gen)
 
